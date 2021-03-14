@@ -1,0 +1,16 @@
+/* 公共样式 */
+html,
+body,
+#app {
+ min-width: 1366px;
+ height: 100%;
+ margin: 0;
+ padding: 0;
+}
+a {
+  text-decoration: none;
+}
+.btns {
+  display: flex;
+  justify-content: flex-end;
+}
