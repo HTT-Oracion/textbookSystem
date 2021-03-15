@@ -19,16 +19,24 @@ const Order = require('./order')(connect, DataTypes)
 /* Book */
 Book.hasMany(Lesson)
 Book.hasMany(Order)
+Book.belongsTo(Category)
 /* Category */
 Category.hasMany(Book)
 /* Class */
 Class.hasMany(Lesson)
-
+Class.belongsTo(Major)
 /* Lesson */
 Lesson.hasOne(Order)
+Lesson.belongsTo(Book)
+Lesson.belongsTo(Class)
+Lesson.belongsTo(Major)
+Lesson.belongsTo(Department)
+Lesson.belongsTo(Charge)
+Lesson.belongsTo(Approval)
 /* Major */
 Major.hasMany(Class)
 Major.hasMany(Lesson)
+Major.belongsTo(Department)
 /* Department */
 Department.hasMany(Major)
 Department.hasMany(Lesson)
@@ -40,6 +48,11 @@ Charge.hasMany(Order)
 Approval.hasMany(Lesson)
 Approval.hasMany(Order)
 /* Order */
+Order.belongsTo(Book)
+Order.belongsTo(Charge)
+Order.belongsTo(Approval)
+Order.belongsTo(Lesson)
+Order.belongsTo(Department)
 module.exports = {
   Sequelize,
   connect,

@@ -13,9 +13,9 @@ module.exports = app => {
     Approval,
     Order
   } = require('../models')
-  connect.sync()
+  // connect.sync({ force: true })
   require('./user')(app, User)
-  require('./book')(app, Book)
+  require('./book')(app, Book, Category, Sequelize)
   require('./category')(app, Category)
   require('./department')(app, Department)
   require('./major')(app, Major)

@@ -13,6 +13,7 @@ const checkMobile = (rule, value, callback) => {
   }
   callback(new Error('请输入合法的手机号！'))
 }
+
 export const loginRules = {
   username: [
     { required: true, message: '请输入账号!', trigger: 'blur' }
@@ -40,5 +41,29 @@ export const registerRules = {
   email: [
     { required: true, message: '请输入邮箱!', trigger: 'blur' },
     { validator: checkEmail, trigger: 'blur' }
+  ]
+}
+/* 书 */
+export const bookRules = {
+  ISBN: [
+    { required: true, message: '请输入isbn编号!', trigger: 'blur' }
+  ],
+  book_name: [
+    { required: true, message: '请输入书名!', trigger: 'blur' }
+  ],
+  author: [
+    { required: true, message: '请输入作者名!', trigger: 'blur' }
+  ],
+  publish: [
+    { required: true, message: '请输入出版社名!', trigger: 'blur' }
+  ],
+  date: [
+    { required: true, message: '请输入出版日期!', trigger: 'blur' }
+  ],
+  price: [
+    { required: true, message: '请输入价格!', trigger: 'blur' }
+  ],
+  category: [
+    { required: true, message: '请选择类别!', trigger: 'blur' }
   ]
 }

@@ -45,8 +45,8 @@ export default {
   data () {
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: 'doro250',
+        password: 'yy123456'
       },
       loginFormRules: loginRules
     }
@@ -67,7 +67,6 @@ export default {
           this.$store.commit('SET_USER', data.result.token)
           this.$store.commit('SET_USER_LEVEL', data.result.level)
           this.$store.commit('SET_USER_POSITION', data.result.position)
-          // console.log(this.$store.state);
           this.$router.push({ name: 'Home' })
           this.$refs.loginRef.resetFields()
         }

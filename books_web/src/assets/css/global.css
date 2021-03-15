@@ -14,3 +14,9 @@ a {
   display: flex;
   justify-content: flex-end;
 }
+.el-table {
+  margin: 20px 0;
+}
+.el-pagination {
+  margin-top: 15px;
+}

@@ -1,10 +1,10 @@
 import api from '@/utils/request'
 
-export const getBooksApi = () => {
-  return api('get', '/book/list')
+export const getBooksApi = (queryInfo) => {
+  return api('get', '/book/list', { params: queryInfo })
 }
 export const addBookApi = data => {
-  return api('post', '/book', data)
+  return api('post', '/book/add', data)
 }
 export const editBookApi = (bookId, data) => {
   return api('put', `/book/${bookId}`, data)
@@ -17,7 +17,7 @@ export const getCatesApi = () => {
   return api('get', '/category/list')
 }
 export const addCateApi = data => {
-  return api('post', '/category', data)
+  return api('post', '/category/add', data)
 }
 
 export const editCateApi = (cateId, data) => {

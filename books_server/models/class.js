@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       unique: true
     },
-    major: {
+    major_name: {
       type: DataTypes.STRING,
       allowNull: false
     },
