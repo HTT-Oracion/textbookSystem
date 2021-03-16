@@ -19,7 +19,7 @@
         </el-col>
       </el-row>
       <!-- 表格 -->
-      <el-table :data="bookList" border>
+      <el-table :data="bookList" border stripe>
         <el-table-column prop="id" label="id"> </el-table-column>
         <el-table-column prop="ISBN" label="ISBN"> </el-table-column>
         <el-table-column prop="book_name" label="书名"> </el-table-column>
@@ -32,12 +32,15 @@
         </el-table-column>
         <el-table-column label="操作" width="200">
           <template #default="scoped">
-            <el-button type="primary">编辑</el-button>
-            <el-button type="danger" @click="deleteBook">删除</el-button>
+            <el-button type="primary" @click="toEdit(scoped.row.id)"
+              >编辑</el-button
+            >
+            <el-button type="danger" @click="deleteBook(scoped.row.id)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
-      <!-- 分页器 -->
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -51,27 +54,37 @@
     </el-card>
     <add-book
       :addBookVisible="addBookVisible"
-      @close="addBookVisible = $event"
+      @close="addBookVisible = false"
       @update="getBookList"
     ></add-book>
+    <edit-book
+      :editBookVisible="editBookVisible"
+      :currentBook="currentBook"
+      @close="editBookVisible = false"
+      @update="getBookList"
+    ></edit-book>
   </div>
 </template>
 
 <script>
 import AddBook from '@/components/AddBook'
+import EditBook from '@/components/EditBook'
 import { pageMixin } from '@/mixin'
-import { getBooksApi } from '@/api/book'
+import { getBooksApi, getBookById, deleteBookApi } from '@/api/book'
 // import { errorTip, successTip, infoTip } from '@/utils/viewsTool'
 export default {
   name: 'Book',
   components: {
-    AddBook
+    AddBook,
+    EditBook
   },
   mixins: [pageMixin],
   data () {
     return {
       bookList: [],
-      addBookVisible: false
+      currentBook: {},
+      addBookVisible: false,
+      editBookVisible: false
     }
   },
   watch: {
@@ -90,15 +103,24 @@ export default {
       console.log(data);
     },
     addBook () { },
-    deleteBook () {
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+    async toEdit (id) {
+      const { data } = await getBookById(id)
+      this.currentBook = data.result
+      this.editBookVisible = true
+    },
+    deleteBook (id) {
+      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        console.log(111);
-        this.$message.success('删除成功!')
-        this.getBookList()
+      }).then(async () => {
+        const { data } = await deleteBookApi(id)
+        if (data.status === 200) {
+          this.$message.success('删除成功!')
+          this.getBookList()
+        } else {
+          this.$message.error('删除失败!')
+        }
       })
     }
   },

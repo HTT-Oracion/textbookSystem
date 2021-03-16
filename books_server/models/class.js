@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     grade: {
       type: DataTypes.INTEGER,
-      unique: true
     },
     major_name: {
       type: DataTypes.STRING,

@@ -38,7 +38,7 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="btns">
-      <el-button @click="$emit('close', false)">取 消</el-button>
+      <el-button @click="$emit('close')">取 消</el-button>
       <el-button type="primary" @click="confirmAddBook">确 定</el-button>
     </span>
   </el-dialog>
@@ -68,7 +68,7 @@ export default {
         category: ''
       },
       addBookRules: bookRules,
-      categories: []
+      categories: [],
     }
   },
   methods: {
@@ -88,12 +88,11 @@ export default {
         } else {
           this.$message.error('添加失败!')
         }
-        this.$emit('close', false)
+        this.$emit('close')
       }).catch(() => {
-        this.$message.success('取消操作!')
-        this.$emit('close', false)
-
-      });
+        this.$message.info('取消操作!')
+        this.$emit('close')
+      })
     }
   },
   created () {

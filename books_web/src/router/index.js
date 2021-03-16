@@ -11,6 +11,10 @@ const routes = [
     path: '/home', name: 'Home', component: () => import('@/views/Home'), redirect: '/book',
     children: [
       { path: '/book', name: 'Book', component: () => import('@/views/Book') },
+      { path: '/category', name: 'Category', component: () => import('@/views/Category') },
+      { path: '/department', name: 'Department', component: () => import('@/views/Department') },
+      { path: '/major', name: 'Major', component: () => import('@/views/Major') },
+      { path: '/class', name: 'Class', component: () => import('@/views/Class') },
     ]
   },
 
