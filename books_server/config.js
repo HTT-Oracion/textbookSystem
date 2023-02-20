@@ -1,10 +1,11 @@
 module.exports = {
-  database: 'books2_server',
-  username: 'root',
-  password: 'doro1314',
-  host: 'localhost',
-  dialect: 'mysql',
-
+  database: 'books2_server',  // 库名
+  username: 'root',           // 用户名
+  password: 'doro1314',       // 密码
+  host: 'localhost',         
+  dialect: 'mysql',           // 所用数据库
+  
+  // 下面是一些基础配置，详见squelize
   pool: {
     max: 5,
     min: 0,
