@@ -4,11 +4,24 @@
 ## 前端
 ```
 使用 vue2 element vuex 
+
 ```
 
 ## 后端
 ```
- express jsonwebtoken squelize(操作mysql)
+ express jsonwebtoken mysql squelize(用于操作mysql)
+```
+
+## 项目运行
+```
+前端： 进入`books_web`: 先执行 `npm install`，完成后 执行`npm run start`
+
+后端： 进入`books_server`: 先执行 `npm install`，完成后 执行`npm run start`
+```
+
+## 注意事项
+```
+请确保已经安装和运行mysql
 ```
 
 ## 存在问题
