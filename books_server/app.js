@@ -1,6 +1,7 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const cors = require('cors')
+import express from 'express'
+import bodyParser from 'body-parser'
+import cors from 'cors'
+import router from '#src/router'
 const app = express()
 const port = 3333
 
@@ -10,7 +11,7 @@ app.use(bodyParser.json())
 app.use(cors())
 
 /* 路由 */
-require('./router')(app)
+router(app)
 app.listen(port, () => {
   console.log(`server at ${port}`);
 })
