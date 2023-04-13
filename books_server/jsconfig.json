@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+            "#src/*": [
+                "./src/*"
+            ],
+            "#settings/*": [
+                "./src/settings/*"
+            ],
+            "#utils/*": [
+                "./src/utils/*"
+            ],
+            "#router/*": [
+                "./src/router/*"
+            ],
+        },
+        "moduleResolution": "node"
+    }
+}
