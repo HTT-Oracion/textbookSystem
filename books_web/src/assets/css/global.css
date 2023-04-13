@@ -1,0 +1,40 @@
+/* 公共样式 */
+html,
+body,
+#app {
+ min-width: 1366px;
+ height: 100%;
+ margin: 0;
+ padding: 0;
+}
+a {
+  text-decoration: none;
+}
+.btns {
+  display: flex;
+  justify-content: flex-end;
+}
+.el-table {
+  margin: 20px 0;
+}
+.el-pagination {
+  margin-top: 15px;
+}
+.el-select {
+  width: 100%;
+}
+i,
+.el-menu-item,
+.el-submenu,
+.person-level,
+.el-pagination{
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+}
+@media screen and (max-width: 1144px) {
+  .person-level {
+    display: none;
+  }
+}
