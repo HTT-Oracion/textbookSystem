@@ -13,7 +13,9 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="toAdd"> 添加院系</el-button>
+          <el-button type="primary" @click="addDepVisible = true">
+            添加院系</el-button
+          >
         </el-col>
       </el-row>
       <el-table :data="depList" border stripe>
@@ -80,102 +82,100 @@
 </template>
 
 <script>
-import { getDepsApi, deleteDepApi, addDepApi, getDepById, editDepApi } from '@/api/information'
-import { pageMixin } from '@/mixin'
+import {
+  getDepsApi,
+  deleteDepApi,
+  addDepApi,
+  getDepById,
+  editDepApi
+} from "@/api/information";
+// import confirmDelete from '@/utils/confirmDelete'
+import { pageMixin } from "@/mixin";
 export default {
-  name: 'Department',
+  name: "Department",
   mixins: [pageMixin],
-  data () {
+  data() {
     return {
       // 院系列表
       depList: [],
       postForm: {
-        id: '',
-        dep_name: ''
+        id: "",
+        dep_name: ""
       },
       addDepVisible: false,
       editDepVisible: false
-    }
+    };
   },
   watch: {
-    'queryInfo.pageNum': function (val, oldVal) {
-      this.getDepList()
+    "queryInfo.pageNum": function(val, oldVal) {
+      this.getDepList();
     },
-    'queryInfo.pageSize': function (val, oldVal) {
-      this.getDepList()
+    "queryInfo.pageSize": function(val, oldVal) {
+      this.getDepList();
     }
   },
-  created () {
-    this.getDepList()
+  created() {
+    this.getDepList();
   },
   methods: {
-    async getDepList () {
-      const { data } = await getDepsApi(this.queryInfo)
-      this.depList = data.result
-      this.total = data.result.length
+    async getDepList() {
+      const { data } = await getDepsApi(this.queryInfo);
+      this.depList = data.result;
     },
-    reset (ref) {
-      this.addDepVisible = false
-      this.editDepVisible = false
-      this.$refs[ref].resetFields()
+    reset(ref) {
+      this.addDepVisible = false;
+      this.editDepVisible = false;
+      this.$refs[ref].resetFields();
     },
-    toAdd () {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.addDepVisible = true
+    async toEdit(id) {
+      this.editDepVisible = true;
+      const { data } = await getDepById(id);
+      this.postForm = data.result;
     },
-    async toEdit (id) {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.editDepVisible = true
-      const { data } = await getDepById(id)
-      this.postForm = data.result
-    },
-    async deleteDep (id) {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    async deleteDep(id) {
+      this.$confirm("此操作将永久删除该数据, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       }).then(async () => {
-        const { data } = await deleteDepApi(id)
+        const { data } = await deleteDepApi(id);
         if (data.status === 200) {
-          this.$message.success('删除成功!')
-          this.getDepList()
+          this.$message.success("删除成功!");
+          this.getDepList();
         } else {
-          this.$message.error('删除失败!')
+          this.$message.error("删除失败!");
         }
-      }).catch(() => {
-        this.$message.info('取消操作')
-      })
+      });
     },
-    async confirmAddDep () {
-      if (this.postForm.id === '' || this.postForm.dep_name === '') return this.$message.error('请填写完整!')
-      const { data } = await addDepApi(this.postForm)
+    async confirmAddDep() {
+      if (this.postForm.id === "" || this.postForm.dep_name === "")
+        return this.$message.error("请填写完整!");
+      const { data } = await addDepApi(this.postForm);
       if (data.status === 200) {
-        this.$message.success('添加成功!')
-        this.getDepList()
-        this.reset('addDepRef')
+        this.$message.success("添加成功!");
+        this.getDepList();
+        this.reset("addDepRef");
       } else {
-        this.$message.error('添加失败!')
-        this.reset('addDepRef')
+        this.$message.error("添加失败!");
+        this.reset("addDepRef");
       }
     },
-    async confirmEditDep () {
-      const { data } = await editDepApi(this.postForm.id, this.postForm)
+    async confirmEditDep() {
+      const { data } = await editDepApi(this.postForm.id, this.postForm);
       if (data.status === 200) {
-        this.$message.success('修改成功!')
-        this.reset('editDepRef')
-        this.getDepList()
+        this.$message.success("修改成功!");
+        this.reset("editDepRef");
+        this.getDepList();
       } else {
-        this.$message.error('修改失败!')
-        this.reset('editDepRef')
+        this.$message.error("修改失败!");
+        this.reset("editDepRef");
       }
     },
-    handleClose () {
-      this.reset('editDepRef')
+    handleClose() {
+      this.reset("editDepRef");
     }
   }
-}
+};
 </script>
 
-<style>
-</style>
+<style></style>

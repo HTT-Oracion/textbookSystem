@@ -5,7 +5,11 @@
       <el-row>
         <el-col :span="8">
           <el-input v-model="queryInfo.query">
-            <el-button slot="append" icon="el-icon-search" @click="getBookList"></el-button>
+            <el-button
+              slot="append"
+              icon="el-icon-search"
+              @click="getBookList"
+            ></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -14,19 +18,24 @@
       </el-row>
       <!-- 表格 -->
       <el-table :data="bookList" border stripe>
-        <el-table-column prop="id" label="id"></el-table-column>
-        <el-table-column prop="ISBN" label="ISBN"></el-table-column>
-        <el-table-column prop="book_name" label="书名"></el-table-column>
-        <el-table-column prop="author" label="作者"></el-table-column>
-        <el-table-column prop="publish" label="出版社"></el-table-column>
-        <el-table-column prop="date" label="出版日期"></el-table-column>
-        <el-table-column prop="price" label="单价" width="50"></el-table-column>
-        <el-table-column prop="nums" label="余量" width="50"></el-table-column>
-        <el-table-column prop="times" label="使用次数" width="100"></el-table-column>
+        <el-table-column prop="id" label="id"> </el-table-column>
+        <el-table-column prop="ISBN" label="ISBN"> </el-table-column>
+        <el-table-column prop="book_name" label="书名"> </el-table-column>
+        <el-table-column prop="author" label="作者"> </el-table-column>
+        <el-table-column prop="publish" label="出版社"> </el-table-column>
+        <el-table-column prop="date" label="出版日期"> </el-table-column>
+        <el-table-column prop="price" label="单价" width="50">
+        </el-table-column>
+        <el-table-column prop="times" label="使用次数" width="100">
+        </el-table-column>
         <el-table-column label="操作" width="200">
           <template #default="scoped">
-            <el-button type="primary" @click="toEdit(scoped.row.id)">编辑</el-button>
-            <el-button type="danger" @click="deleteBook(scoped.row.id)">删除</el-button>
+            <el-button type="primary" @click="toEdit(scoped.row.id)"
+              >编辑</el-button
+            >
+            <el-button type="danger" @click="deleteBook(scoped.row.id)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -40,83 +49,86 @@
         :total="total"
       ></el-pagination>
     </el-card>
-    <add-book :addVisible="addVisible" @close="closeDialog" @update="getBookList"></add-book>
-    <edit-book :editVisible="editVisible" :currentBook="currentBook" @close="closeDialog" @update="getBookList"></edit-book>
+    <add-book
+      :addBookVisible="addBookVisible"
+      @close="addBookVisible = false"
+      @update="getBookList"
+    ></add-book>
+    <edit-book
+      :editBookVisible="editBookVisible"
+      :currentBook="currentBook"
+      @close="editBookVisible = false"
+      @update="getBookList"
+    ></edit-book>
   </div>
 </template>
 
 <script>
-import AddBook from '@/components/AddBook'
-import EditBook from '@/components/EditBook'
-import { pageMixin } from '@/mixin'
-import { getBooksApi, getBookById, deleteBookApi } from '@/api/book'
+import AddBook from "@/components/AddBook";
+import EditBook from "@/components/EditBook";
+import { pageMixin } from "@/mixin";
+import { getBooksApi, getBookById, deleteBookApi } from "@/api/book";
 // import { errorTip, successTip, infoTip } from '@/utils/viewsTool'
 export default {
-  name: 'Book',
+  name: "Book",
   components: {
     AddBook,
     EditBook
   },
   mixins: [pageMixin],
-  data () {
+  data() {
     return {
       bookList: [],
       currentBook: {},
-      addVisible: false,
-      editVisible: false
-    }
+      addBookVisible: false,
+      editBookVisible: false
+    };
   },
   watch: {
-    'queryInfo.pageNum': function (val, oldVal) {
-      this.getBookList()
+    "queryInfo.pageNum": function(val, oldVal) {
+      this.getBookList();
     },
-    'queryInfo.pageSize': function (val, oldVal) {
-      this.getBookList()
+    "queryInfo.pageSize": function(val, oldVal) {
+      this.getBookList();
     }
   },
   methods: {
-    async getBookList () {
-      const { data } = await getBooksApi(this.queryInfo)
-      this.bookList = data.result
-      this.total = data.total
+    async getBookList() {
+      const { data } = await getBooksApi(this.queryInfo);
+      this.bookList = data.result;
+      this.total = data.total;
       console.log(data);
     },
-    toAdd () {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.addVisible = true
+    addBook() {},
+    async toEdit(id) {
+      const { data } = await getBookById(id);
+      this.currentBook = data.result;
+      this.editBookVisible = true;
     },
-    async toEdit (id) {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      const { data } = await getBookById(id)
-      this.currentBook = data.result
-      this.editVisible = true
-    },
-    deleteBook (id) {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    deleteBook(id) {
+      this.$confirm("此操作将永久删除该数据, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       }).then(async () => {
-        const { data } = await deleteBookApi(id)
+        const { data } = await deleteBookApi(id);
         if (data.status === 200) {
-          this.$message.success('删除成功!')
-          this.getBookList()
+          this.$message.success("删除成功!");
+          this.getBookList();
         } else {
-          this.$message.error('删除失败!')
+          this.$message.error("删除失败!");
         }
-      })
+      });
     },
-    closeDialog () {
-      this.addVisible = false
-      this.editVisible = false
+    closeDialog() {
+      this.addVisible = false;
+      this.editVisible = false;
     }
   },
-  created () {
-    this.getBookList()
+  created() {
+    this.getBookList();
   }
-}
+};
 </script>
 
-<style>
-</style>
+<style></style>

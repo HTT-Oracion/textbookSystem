@@ -13,11 +13,9 @@ module.exports = app => {
     Approval,
     Order
   } = require('../models')
-  // fix: mysql 创建表失败
-  // 调用函数强制更新
-  connect.sync({ force: true })
-  require('./user')(app, User, Sequelize)
-  require('./book')(app, Book, Sequelize)
+  // connect.sync({ force: true })
+  require('./user')(app, User)
+  require('./book')(app, Book, Category, Sequelize)
   require('./category')(app, Category, Sequelize)
   require('./department')(app, Department, Sequelize)
   require('./major')(app, Major, Sequelize)

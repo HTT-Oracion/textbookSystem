@@ -2,8 +2,9 @@ module.exports = (app, Category, Sequelize) => {
   const router = require('express').Router()
   const Op = Sequelize.Op
   router.get('/list', async (req, res) => {
-    const query = req.query.query
-    console.log(query);
+    const query = req.query.query,
+      pageNum = parseInt(req.query.pageNum) || 1,
+      pageSize = parseInt(req.query.pageSize) || 5
     let whereObj = {
       [Op.or]: [
         { cat_name: { [Op.like]: '%' + query + '%' } }
@@ -14,12 +15,16 @@ module.exports = (app, Category, Sequelize) => {
     if (query) {
       const { count, rows } = await Category.findAndCountAll({
         raw: true,
-        where: whereObj
+        where: whereObj,
+        offset: (pageNum - 1) * pageSize,
+        limit: pageSize
       })
       total = count
       dataList = rows
     } else {
       const { count, rows } = await Category.findAndCountAll({
+        offset: (pageNum - 1) * pageSize,
+        limit: pageSize
       })
       total = count
       dataList = rows
@@ -31,7 +36,7 @@ module.exports = (app, Category, Sequelize) => {
     const cate = await Category.findOne({
       where: { id: req.params.id }
     })
-    if (!cate) return res.send({ status: 400, msg: '查找失败' })
+    if (!cate) return res.send({ status: 401, msg: '查找失败' })
     return res.send({ status: 200, msg: '查找成功', result: cate })
   })
   router.put('/:id', async (req, res) => {
@@ -39,7 +44,7 @@ module.exports = (app, Category, Sequelize) => {
     const cate = await Category.update(req.body, {
       where: { id: req.params.id }
     })
-    if (!cate) return res.send({ status: 400, msg: '修改失败!' })
+    if (!cate) return res.send({ status: 401, msg: '修改失败!' })
     return res.send({ status: 200, msg: '修改成功!' })
   })
   router.delete('/:id', async (req, res) => {
@@ -55,12 +60,12 @@ module.exports = (app, Category, Sequelize) => {
   router.post('/add', async (req, res) => {
     const { id } = req.body
     const cate = await Category.findOne({ where: { id } })
-    if (cate) return res.send({ status: 400, msg: '相同编号!' })
+    if (cate) return res.send({ status: 401, msg: '相同编号!' })
     try {
       await Category.create(req.body)
       return res.send({ status: 200, msg: '创建成功!' })
     } catch {
-      return res.send({ status: 400, msg: '创建失败!' })
+      return res.send({ status: 401, msg: '创建失败!' })
     }
   })
   app.use('/category', router)

@@ -43,10 +43,6 @@ export const getClassesApi = queryInfo => {
 export const getClassById = id => {
   return api('get', `/class/${id}`)
 }
-
-export const getClassInCharge = id => {
-  return api('get', `/class/byCharge/${id}}`)
-}
 export const addClassApi = data => {
   return api('post', '/class', data)
 }

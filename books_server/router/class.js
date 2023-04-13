@@ -38,12 +38,12 @@ module.exports = (app, Class, Sequelize) => {
   router.post('/add', async (req, res) => {
     const { id } = req.body
     const dep = await Class.findOne({ where: { id } })
-    if (dep) return res.send({ status: 400, msg: '相同编号!' })
+    if (dep) return res.send({ status: 401, msg: '相同编号!' })
     try {
       await Class.create(req.body)
       return res.send({ status: 200, msg: '创建成功!' })
     } catch {
-      return res.send({ status: 400, msg: '创建失败!' })
+      return res.send({ status: 401, msg: '创建失败!' })
     }
   })
   router.get('/:id', async (req, res) => {
@@ -51,18 +51,14 @@ module.exports = (app, Class, Sequelize) => {
       where: { id: req.params.id },
       include: Major
     })
-    if (!result) return res.send({ status: 400, msg: '查找失败' })
+    if (!result) return res.send({ status: 401, msg: '查找失败' })
     return res.send({ status: 200, msg: '查找成功', result: result })
-  })
-  router.get('/byCharge/:id', async (req, res) => {
-    const result = await Class.findAll({ where: { chargeId: req.params.id } })
-    return res.send({ status: 200, msg: '获取列表成功!', result })
   })
   router.put('/:id', async (req, res) => {
     const result = await Class.update(req.body, {
       where: { id: req.params.id }
     })
-    if (!result) return res.send({ status: 400, msg: '修改失败!' })
+    if (!result) return res.send({ status: 401, msg: '修改失败!' })
     return res.send({ status: 200, msg: '修改成功!' })
   })
   router.delete('/:id', async (req, res) => {
@@ -75,6 +71,5 @@ module.exports = (app, Class, Sequelize) => {
       return res.send({ status: 400, msg: '删除失败!' })
     }
   })
-
   app.use('/class', router)
 }

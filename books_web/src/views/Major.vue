@@ -4,7 +4,7 @@
       <my-bread nameOne="院系管理" nameTwo="专业列表"></my-bread>
       <el-row>
         <el-col :span="8">
-          <el-input v-model="queryInfo.query">
+          <el-input v-model="queryInfo.query" @clear="getMajorList">
             <el-button
               slot="append"
               icon="el-icon-search"
@@ -13,7 +13,9 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="toAdd"> 添加专业</el-button>
+          <el-button type="primary" @click="addMajorVisible = true">
+            添加专业</el-button
+          >
         </el-col>
       </el-row>
       <el-table :data="MajorList" border stripe>
@@ -114,111 +116,104 @@
 import {
   getMajorsApi,
   getMajorById,
-  getAllListApi,
+  getDepsApi,
   addMajorApi,
   editMajorApi,
   deleteMajorApi
-} from '@/api/information'
-import { pageMixin } from '@/mixin'
+} from "@/api/information";
+import { pageMixin } from "@/mixin";
 export default {
-  name: 'Major',
+  name: "Major",
   mixins: [pageMixin],
-  data () {
+  data() {
     return {
       MajorList: [],
       depList: [],
       postForm: {
-        id: '',
-        major_name: '',
-        departmentId: ''
+        id: "",
+        major_name: "",
+        departmentId: ""
       },
       addMajorVisible: false,
-      editMajorVisible: false,
-    }
+      editMajorVisible: false
+    };
   },
   watch: {
-    'queryInfo.pageNum': function (val, oldVal) {
-      this.getMajorList()
+    "queryInfo.pageNum": function(val, oldVal) {
+      this.getMajorList();
     },
-    'queryInfo.pageSize': function (val, oldVal) {
-      this.getMajorList()
+    "queryInfo.pageSize": function(val, oldVal) {
+      this.getMajorList();
     }
   },
-  created () {
-    this.getMajorList()
-    this.getDepList()
+  created() {
+    this.getMajorList();
+    this.getDepList();
   },
   methods: {
-    reset (ref) {
-      this.addMajorVisible = false
-      this.editMajorVisible = false
-      this.$refs[ref].resetFields()
+    reset(ref) {
+      this.addMajorVisible = false;
+      this.editMajorVisible = false;
+      this.$refs[ref].resetFields();
     },
-    async getDepList () {
-      const { data } = await getAllListApi('Department')
-      this.depList = data.result
+    async getDepList() {
+      const { data } = await getDepsApi();
+      this.depList = data.result;
     },
-    async getMajorList () {
-      const { data } = await getMajorsApi(this.queryInfo)
-      this.MajorList = data.result
-      this.total = data.result.length
+    async getMajorList() {
+      const { data } = await getMajorsApi(this.queryInfo);
+      this.MajorList = data.result;
       console.log(this.MajorList);
     },
-    toAdd () {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.addMajorVisible = true
+    async toEdit(id) {
+      this.editMajorVisible = true;
+      const { data } = await getMajorById(id);
+      this.postForm = data.result;
     },
-    async toEdit (id) {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      const { data } = await getMajorById(id)
-      this.postForm = data.result
-      this.editMajorVisible = true
-    },
-    deleteMajor (id) {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    deleteMajor(id) {
+      this.$confirm("此操作将永久删除该数据, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       }).then(async () => {
-        const { data } = await deleteMajorApi(id)
+        const { data } = await deleteMajorApi(id);
         if (data.status === 200) {
-          this.$message.success('删除成功!')
-          this.getMajorList()
+          this.$message.success("删除成功!");
+          this.getMajorList();
         } else {
-          this.$message.error('删除失败!')
+          this.$message.error("删除失败!");
         }
-      })
+      });
     },
-    async confirmAddMajor () {
-      if (this.postForm.id === '' || this.postForm.major_name === '') return this.$message.error('请填写完整!')
-      const { data } = await addMajorApi(this.postForm)
+    async confirmAddMajor() {
+      if (this.postForm.id === "" || this.postForm.major_name === "")
+        return this.$message.error("请填写完整!");
+      const { data } = await addMajorApi(this.postForm);
       if (data.status === 200) {
-        this.$message.success('添加成功!')
-        this.getMajorList()
-        this.reset('addMajorRef')
+        this.$message.success("添加成功!");
+        this.getMajorList();
+        this.reset("addMajorRef");
       } else {
-        this.$message.error('添加失败!')
-        this.reset('addMajorRef')
+        this.$message.error("添加失败!");
+        this.reset("addMajorRef");
       }
     },
-    async confirmEditMajor () {
-      const { data } = await editMajorApi(this.postForm.id, this.postForm)
+    async confirmEditMajor() {
+      const { data } = await editMajorApi(this.postForm.id, this.postForm);
       if (data.status === 200) {
-        this.$message.success('修改成功!')
-        this.reset('editMajorRef')
-        this.getMajorList()
+        this.$message.success("修改成功!");
+        this.reset("editMajorRef");
+        this.getMajorList();
       } else {
-        this.$message.error('修改失败!')
-        this.reset('editMajorRef')
+        this.$message.error("修改失败!");
+        this.reset("editMajorRef");
       }
     },
-    handleClose () {
-      this.reset('editMajorRef')
+    handleClose() {
+      this.reset("editMajorRef");
     }
   }
-}
+};
 </script>
 
-<style>
-</style>
+<style></style>

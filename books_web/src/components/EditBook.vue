@@ -1,37 +1,32 @@
 <template>
   <el-dialog
     title="编辑教材"
-    :visible.sync="editVisible"
+    :visible.sync="editBookVisible"
     width="50%"
-    :show-close="false"
-    @close="$emit('close')"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    :before-close="handleClose"
+    v-if="editBookVisible"
   >
     <el-form ref="editBookRef" :model="currentBook" label-width="100px">
+      <el-form-item prop="id" label="id">
+        <el-input v-model="currentBook.id" disabled></el-input>
+      </el-form-item>
       <el-form-item prop="ISBN" label="isbn编号：">
         <el-input v-model="currentBook.ISBN" disabled></el-input>
       </el-form-item>
-      <el-form-item prop="book_name" label="书名：">
-        <el-input v-model="currentBook.book_name" disabled></el-input>
+      <el-form-item prop="book_name" label="书名">
+        <el-input v-model="currentBook.book_name"></el-input>
       </el-form-item>
-      <el-form-item prop="author" label="作者：">
+      <el-form-item prop="author" label="作者">
         <el-input v-model="currentBook.author"></el-input>
       </el-form-item>
-      <el-form-item prop="publish" label="出版社：">
+      <el-form-item prop="publish" label="出版社">
         <el-input v-model="currentBook.publish"></el-input>
       </el-form-item>
-      <el-form-item prop="date" label="出版日期：">
+      <el-form-item prop="date" label="出版日期">
         <el-input v-model="currentBook.date"></el-input>
       </el-form-item>
-      <el-form-item prop="price" label="单价(元)：">
-        <el-input v-model.number="currentBook.price"></el-input>
-      </el-form-item>
-      <el-form-item prop="category" label="类别：">
-        <el-input v-model.number="currentBook.categoryId" disabled></el-input>
-      </el-form-item>
-      <el-form-item prop="nums" label="余量">
-        <el-input v-model.number="currentBook.nums"></el-input>
+      <el-form-item prop="price" label="价格">
+        <el-input v-model="currentBook.price"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="btns">
@@ -42,44 +37,60 @@
 </template>
 
 <script>
-import { getCatesApi, editBookApi } from '@/api/book'
+import { getBookById, editBookApi } from "@/api/book";
 export default {
-  name: 'EditBook',
+  name: "EditBook",
   props: {
-    currentBook: Object,
-    editVisible: {
+    editBookVisible: {
       type: Boolean,
       default: false
-    }
+    },
+    currentBook: Object
   },
-  data () {
+  data() {
     return {
-      categories: []
-    }
-  },
-  created () {
-    this.getCategories()
+      editkForm: {
+        id: "",
+        ISBN: "",
+        book_name: "",
+        author: "",
+        publish: "",
+        date: "",
+        price: ""
+      }
+    };
   },
   methods: {
-    async getCategories () {
-      const { data } = await getCatesApi()
-      this.categories = data.result
-      console.log(this.currentBook);
+    async getBookDetail() {
+      const { data } = await getBookById(this.id);
+      console.log(data);
     },
-    async confirmEditBook () {
-      const { data } = await editBookApi(this.currentBook.id, this.currentBook)
-      if (data.status === 200) {
-        this.$message.success('修改成功!')
-        this.$emit('close')
-        this.$emit('update')
-      } else {
-        this.$message.error('修改失败!')
-        this.$emit('close')
-      }
+    async confirmEditBook() {
+      this.$confirm("修改教材信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const { id } = this.currentBook;
+          const { data } = await editBookApi(id, this.currentBook);
+          if (data.status === 200) {
+            this.$message.success("编辑成功!");
+            this.$emit("update");
+          } else {
+            this.$message.error("编辑失败!");
+          }
+          this.$emit("close");
+        })
+        .catch(() => {
+          this.$message.info("取消操作!");
+          this.$emit("close");
+        });
+    },
+    handleClose() {
+      this.$emit("close");
     }
   }
-}
+};
 </script>
 
-<style>
-</style>
+<style></style>

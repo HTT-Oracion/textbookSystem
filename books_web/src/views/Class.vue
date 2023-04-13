@@ -137,92 +137,88 @@ import {
   addClassApi,
   editClassApi,
   deleteClassApi
-} from '@/api/information'
-import { pageMixin } from '@/mixin'
+} from "@/api/information";
+import { pageMixin } from "@/mixin";
 export default {
-  name: 'Class',
+  name: "Class",
   mixins: [pageMixin],
-  data () {
+  data() {
     return {
       addClassVisible: false,
       editClassVisible: false,
       classList: [],
       postForm: {}
-    }
+    };
   },
   watch: {
-    'queryInfo.pageNum': function (val, oldVal) {
-      this.getClassList()
+    "queryInfo.pageNum": function(val, oldVal) {
+      this.getClassList();
     },
-    'queryInfo.pageSize': function (val, oldVal) {
-      this.getClassList()
+    "queryInfo.pageSize": function(val, oldVal) {
+      this.getClassList();
     }
   },
-  created () {
-    this.getClassList()
+  created() {
+    this.getClassList();
   },
   methods: {
-    async getClassList () {
-      const { data } = await getClassesApi(this.queryInfo)
-      this.classList = data.result
-      this.total = data.result.length
+    async getClassList() {
+      const { data } = await getClassesApi(this.queryInfo);
+      this.classList = data.result;
     },
-    reset (ref) {
+    reset(ref) {
       // this.addClassVisible = false
-      this.editClassVisible = false
-      this.$refs[ref].resetFields()
+      this.editClassVisible = false;
+      this.$refs[ref].resetFields();
     },
-    async toEdit (id) {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.editClassVisible = true
-      const { data } = await getClassById(id)
+    async toEdit(id) {
+      this.editClassVisible = true;
+      const { data } = await getClassById(id);
       console.log(data);
-      this.postForm = data.result
+      this.postForm = data.result;
     },
-    deleteClass (id) {
-      if (this.user.level !== 0 && this.user.level !== 1) return this.$message.error('没有操作权限！')
-      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    deleteClass(id) {
+      this.$confirm("此操作将永久删除该数据, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       }).then(async () => {
-        const { data } = await deleteClassApi(id)
+        const { data } = await deleteClassApi(id);
         if (data.status === 200) {
-          this.$message.success('删除成功!')
-          this.getClassList()
+          this.$message.success("删除成功!");
+          this.getClassList();
         } else {
-          this.$message.error('删除失败!')
+          this.$message.error("删除失败!");
         }
-      })
+      });
     },
-    async confirmAddClass () {
-      const { data } = await addClassApi(this.postForm)
+    async confirmAddClass() {
+      const { data } = await addClassApi(this.postForm);
       if (data.status === 200) {
-        this.$message.success('添加成功!')
-        this.getClassList()
-        this.reset('addClassRef')
+        this.$message.success("添加成功!");
+        this.getClassList();
+        this.reset("addClassRef");
       } else {
-        this.$message.error('添加失败!')
-        this.reset('addClassRef')
+        this.$message.error("添加失败!");
+        this.reset("addClassRef");
       }
     },
-    async confirmEditClass () {
-      const { data } = await editClassApi(this.postForm.id, this.postForm)
+    async confirmEditClass() {
+      const { data } = await editClassApi(this.postForm.id, this.postForm);
       if (data.status === 200) {
-        this.$message.success('修改成功!')
-        this.reset('editClassRef')
-        this.getClassList()
+        this.$message.success("修改成功!");
+        this.reset("editClassRef");
+        this.getClassList();
       } else {
-        this.$message.error('修改失败!')
-        this.reset('editClassRef')
+        this.$message.error("修改失败!");
+        this.reset("editClassRef");
       }
     },
-    handleClose () {
-      this.reset('editClassRef')
+    handleClose() {
+      this.reset("editClassRef");
     }
   }
-}
+};
 </script>
 
-<style>
-</style>
+<style></style>

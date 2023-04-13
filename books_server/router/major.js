@@ -40,12 +40,12 @@ module.exports = (app, Major, Sequelize) => {
   router.post('/add', async (req, res) => {
     const { id } = req.body
     const result = await Major.findOne({ where: { id } })
-    if (result) return res.send({ status: 400, msg: '相同编号!' })
+    if (result) return res.send({ status: 401, msg: '相同编号!' })
     try {
       await Major.create(req.body)
       return res.send({ status: 200, msg: '创建成功!' })
     } catch {
-      return res.send({ status: 400, msg: '创建失败!' })
+      return res.send({ status: 401, msg: '创建失败!' })
     }
   })
   router.get('/:id', async (req, res) => {
@@ -53,7 +53,7 @@ module.exports = (app, Major, Sequelize) => {
       where: { id: req.params.id },
       include: { model: Department }
     })
-    if (!result) return res.send({ status: 400, msg: '查找失败' })
+    if (!result) return res.send({ status: 401, msg: '查找失败' })
     return res.send({ status: 200, msg: '查找成功', result })
   })
   router.put('/:id', async (req, res) => {
@@ -61,7 +61,7 @@ module.exports = (app, Major, Sequelize) => {
     const result = await Major.update(req.body, {
       where: { id: req.params.id }
     })
-    if (!result) return res.send({ status: 400, msg: '修改失败!' })
+    if (!result) return res.send({ status: 401, msg: '修改失败!' })
     return res.send({ status: 200, msg: '修改成功!' })
   })
   router.delete('/:id', async (req, res) => {

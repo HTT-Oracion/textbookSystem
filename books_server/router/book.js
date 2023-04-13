@@ -36,6 +36,28 @@ module.exports = (app, Book, Sequelize) => {
     if (bookList.length === 0) return res.send({ status: 422, msg: '没有任何教材!' })
     return res.send({ status: 200, msg: `获取文章列表成功`, result: bookList, total })
   })
+  router.get('/:id', async (req, res) => {
+    const book = await Book.findOne({ where: { id: req.params.id } })
+    if (!book) return res.send({ status: 401, msg: '找不到该书相关信息' })
+    return res.send({ status: 200, msg: '获取教材详情成功', result: book })
+  })
+  router.put('/:id', async (req, res) => {
+    const book = await Book.update(req.body, {
+      where: { id: req.params.id }
+    })
+    if (!book) return res.send({ status: 401, msg: '修改失败!' })
+    return res.send({ status: 200, msg: '修改成功!' })
+  })
+  router.delete('/:id', async (req, res) => {
+    try {
+      await Book.destroy({
+        where: { id: req.params.id }
+      })
+      return res.send({ status: 200, msg: '删除成功!' })
+    } catch {
+      return res.send({ status: 400, msg: '删除失败!' })
+    }
+  })
   router.post('/add', async (req, res) => {
     const { id, ISBN, book_name, author, publish, date, price, category } = req.body
     const cate = await Book.findOne({

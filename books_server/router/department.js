@@ -7,7 +7,7 @@ module.exports = (app, Department, Sequelize) => {
       pageSize = parseInt(req.query.pageSize) || 5
     let whereObj = {
       [Op.or]: [
-        { dep_name: { [Op.like]: '%' + query + '%' } }
+        { cat_name: { [Op.like]: '%' + query + '%' } }
       ]
     }
     let total = 0
@@ -35,19 +35,19 @@ module.exports = (app, Department, Sequelize) => {
   router.post('/add', async (req, res) => {
     const { id } = req.body
     const dep = await Department.findOne({ where: { id } })
-    if (dep) return res.send({ status: 400, msg: '相同编号!' })
+    if (dep) return res.send({ status: 401, msg: '相同编号!' })
     try {
       await Department.create(req.body)
       return res.send({ status: 200, msg: '创建成功!' })
     } catch {
-      return res.send({ status: 400, msg: '创建失败!' })
+      return res.send({ status: 401, msg: '创建失败!' })
     }
   })
   router.get('/:id', async (req, res) => {
     const dep = await Department.findOne({
       where: { id: req.params.id }
     })
-    if (!dep) return res.send({ status: 400, msg: '查找失败' })
+    if (!dep) return res.send({ status: 401, msg: '查找失败' })
     return res.send({ status: 200, msg: '查找成功', result: dep })
   })
   router.put('/:id', async (req, res) => {
@@ -55,7 +55,7 @@ module.exports = (app, Department, Sequelize) => {
     const result = await Department.update(req.body, {
       where: { id: req.params.id }
     })
-    if (!result) return res.send({ status: 400, msg: '修改失败!' })
+    if (!result) return res.send({ status: 401, msg: '修改失败!' })
     return res.send({ status: 200, msg: '修改成功!' })
   })
   router.delete('/:id', async (req, res) => {
