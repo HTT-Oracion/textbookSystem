@@ -1,5 +1,6 @@
 
-module.exports = (app, Book, Category, Sequelize) => {
+const { Category } = require('../models')
+module.exports = (app, Book, Sequelize) => {
   const router = require('express').Router()
   const Op = Sequelize.Op
   router.get('/list', async (req, res) => {
@@ -37,7 +38,6 @@ module.exports = (app, Book, Category, Sequelize) => {
   })
   router.post('/add', async (req, res) => {
     const { id, ISBN, book_name, author, publish, date, price, category } = req.body
-    console.log(id, ISBN, book_name, author, publish, date, price, category);
     const cate = await Book.findOne({
       where: { ISBN }
     })
@@ -56,10 +56,53 @@ module.exports = (app, Book, Category, Sequelize) => {
         times: 0,
         categoryId: category
       })
-      if (!newCate) return res.send({ status: 401, msg: '请求参数错误' })
+      if (!newCate) return res.send({ status: 400, msg: '请求参数错误' })
       return res.send({ status: 201, msg: '添加教材成功！' })
     }
 
+  })
+  router.get('/:id', async (req, res) => {
+    const result = await Book.findOne({
+      where: { id: req.params.id }
+    })
+    if (!result) return res.send({ status: 400, msg: '查找失败' })
+    return res.send({ status: 200, msg: '查找成功', result: result })
+  })
+  router.put('/:id', async (req, res) => {
+    // console.log(req.body, req.params.id);
+    const result = await Book.update(req.body, {
+      where: { id: req.params.id }
+    })
+    if (!result) return res.send({ status: 400, msg: '修改失败!' })
+    return res.send({ status: 200, msg: '修改成功!' })
+  })
+  router.put('/num/:id', async (req, res) => {
+    try {
+      const result = await Book.update({
+        times: req.body.times,
+        nums: req.body.nums
+      }, {
+        where: { id: req.params.id }
+      })
+      if (result[0] === 1) {
+        return res.send({ status: 201, msg: '修改成功!' })
+      } else {
+        res.send({ status: 400, msg: '修改失败!' })
+      }
+    } catch (error) {
+      console.log(error);
+      res.send({ status: 400, msg: '修改失败!' })
+    }
+  })
+  router.delete('/:id', async (req, res) => {
+    try {
+      await Book.destroy({
+        where: { id: req.params.id }
+      })
+      return res.send({ status: 200, msg: '删除成功!' })
+    } catch {
+      return res.send({ status: 400, msg: '删除失败!' })
+    }
   })
   app.use('/book', router)
 }

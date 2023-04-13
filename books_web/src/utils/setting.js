@@ -33,13 +33,13 @@ export const navList = [
     ]
   },
   {
-    id: 4, index: '/user', icon: "el-icon-s-custom", title: "人员管理",
+    id: 4, index: '/charge', icon: "el-icon-s-custom", title: "人员管理",
     children: [
       {
-        id: 41, index: '/user/charge', icon: "el-icon-s-goods", title: "订购人员"
+        id: 41, index: '/charge', icon: "el-icon-s-goods", title: "订购人员"
       },
       {
-        id: 42, index: '/user/approval', icon: "el-icon-bell", title: "订购人员"
+        id: 42, index: '/approval', icon: "el-icon-bell", title: "审批人员"
       }
     ]
   },
@@ -48,6 +48,9 @@ export const navList = [
     children: [
       {
         id: 51, index: '/order', icon: "el-icon-s-order", title: "订单列表"
+      },
+      {
+        id: 52, index: '/summary', icon: "el-icon-s-order", title: "订单汇总"
       }
     ]
   }

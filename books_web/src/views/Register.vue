@@ -2,99 +2,55 @@
   <div class="register-page">
     <div class="register-box">
       <h1>用户注册</h1>
-      <el-form
-        class="register-form"
-        :rules="registerRules"
-        :model="registerForm"
-        ref="registerRef"
-        label-width="80px"
-      >
+      <el-form class="register-form" :rules="registerRules" :model="registerForm" ref="registerRef" label-width="80px">
         <el-form-item prop="username" label="账号">
-          <el-input
-            v-model="registerForm.username"
-            placeholder="请输入账号"
-            clearable
-            prefix-icon="el-icon-user-solid"
-          ></el-input>
+          <el-input v-model="registerForm.username" placeholder="请输入账号" clearable prefix-icon="el-icon-user-solid"></el-input>
         </el-form-item>
-        <el-form-item prop="mobile" label="手机号">
-          <el-input
-            v-model="registerForm.mobile"
-            placeholder="请输入手机号"
-            clearable
-            prefix-icon="el-icon-mobile-phone"
-          ></el-input>
+        <el-form-item prop="phone" label="手机号">
+          <el-input v-model="registerForm.phone" placeholder="请输入手机号" clearable prefix-icon="el-icon-mobile-phone"></el-input>
         </el-form-item>
         <el-form-item prop="password" label="密码">
-          <el-input
-            v-model="registerForm.password"
-            placeholder="请输入密码"
-            show-password
-            type="password"
-            clearable
-            prefix-icon="el-icon-lock"
-          ></el-input>
+          <el-input v-model="registerForm.password" placeholder="请输入密码" show-password type="password" clearable prefix-icon="el-icon-lock"></el-input>
         </el-form-item>
         <el-form-item prop="rePassword" label="确认密码">
-          <el-input
-            v-model="rePassword"
-            placeholder="请输入密码"
-            show-password
-            type="password"
-            clearable
-            prefix-icon="el-icon-lock"
-          ></el-input>
+          <el-input v-model="rePassword" placeholder="请输入密码" show-password type="password" clearable prefix-icon="el-icon-lock"></el-input>
         </el-form-item>
         <el-form-item prop="email" label="邮箱">
-          <el-input
-            v-model="registerForm.email"
-            placeholder="请输入邮箱"
-            clearable
-            prefix-icon="el-icon-message"
-          ></el-input>
+          <el-input v-model="registerForm.email" placeholder="请输入邮箱" clearable prefix-icon="el-icon-message"></el-input>
         </el-form-item>
-        <el-form-item prop="position" label="职称">
-          <el-select v-model="registerForm.position" placeholder="请选择">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
+        <el-form-item prop="position" label="职称" v-if="adminRegister">
+          <el-select v-model="registerForm.position" placeholder="请选择" @change="selectChange">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="level" label="性质">
-          <el-radio v-model="registerForm.level" :label="0">订购员</el-radio>
-          <el-radio v-model="registerForm.level" :label="1">审核员</el-radio>
-          <el-radio v-model="registerForm.level" :label="2">普通人员</el-radio>
+        <el-form-item prop="level" label="性质" v-if="adminRegister">
+          <el-radio v-model="registerForm.level" :label="1" :disabled="disabled">教材管理员</el-radio>
+          <el-radio v-model="registerForm.level" :label="2" :disabled="disabled">订购员</el-radio>
+          <el-radio v-model="registerForm.level" :label="3" :disabled="disabled">审核员</el-radio>
+          <el-radio v-model="registerForm.level" :label="4">普通人员</el-radio>
         </el-form-item>
         <el-form-item class="btns register-btn">
           <el-button type="info" @click="resetForm">重置</el-button>
           <el-button type="primary" @click="confirmRegister">注册</el-button>
         </el-form-item>
-        <el-button
-          icon="el-icon-arrow-left"
-          class="back"
-          size="mini"
-          @click="$router.back()"
-        ></el-button>
+        <el-button icon="el-icon-arrow-left" class="back" size="mini" @click="$router.back()"></el-button>
       </el-form>
     </div>
   </div>
 </template>
 <script>
 import { nanoid } from 'nanoid'
-import { addUserApi } from '@/api/user'
+import { addUserApi, addNormalUserApi } from '@/api/user'
 import { errorTip, successTip } from '@/utils/viewTools'
 import { registerRules } from '@/utils/validateRules'
+import { mapGetters } from 'vuex'
 export default {
   name: 'Register',
   data () {
     return {
       registerForm: {
         username: '',
-        mobile: '',
+        phone: '',
         password: '',
         email: '',
         position: '',
@@ -102,6 +58,7 @@ export default {
       },
       registerRules,
       rePassword: '',
+      disabled: false,
       options: [{
         value: '教研室主任',
         label: '教研室主任'
@@ -125,7 +82,17 @@ export default {
       ]
     }
   },
+  computed: {
+    ...mapGetters(['adminRegister']),
+  },
   methods: {
+    selectChange (val) {
+      if (['学生', '老师'].indexOf(val) !== -1) {
+        this.disabled = true
+      } else {
+        this.disabled = false
+      }
+    },
     resetForm () {
       this.$refs.registerRef.resetFields()
     },
@@ -135,18 +102,34 @@ export default {
           return errorTip('请填写完整')
         }
         if (this.rePassword !== this.registerForm.password) return errorTip('请确认两次密码是否一致')
-        const form = { id: nanoid(), ...this.registerForm }
-        const { data } = await addUserApi(form)
-        if (data.status === 201) {
-          const { username, password } = this.registerForm
-          console.log(username, password);
-          successTip('注册成功！')
-          setTimeout(() => {
-            this.$router.push({ name: 'Login', params: { username, password } })
-            this.resetForm()
-          }, 1000)
+        if (this.adminRegister) {  // 管理员注册
+          const form = { id: nanoid(), ...this.registerForm }
+          const { data } = await addUserApi(form)
+          if (data.status === 201) {
+            const { username, password } = this.registerForm
+            console.log(username, password);
+            successTip('注册成功！')
+            setTimeout(() => {
+              this.$router.push({ name: 'Login', params: { username, password } })
+              this.resetForm()
+            }, 1000)
+          }
+        } else {
+          // 普通注册
+          const form = { id: nanoid(), ...this.registerForm }
+          const { data } = await addNormalUserApi(form)
+          if (data.status === 201) {
+            const { username, password } = this.registerForm
+            console.log(username, password);
+            successTip('注册成功！')
+            setTimeout(() => {
+              this.$router.push({ name: 'Login', params: { username, password } })
+              this.resetForm()
+            }, 1000)
+          }
         }
-        console.log(data);
+
+        // console.log(data);
       })
     }
   }
@@ -164,7 +147,6 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 600px;
-    height: 625px;
     background: #fff;
     box-sizing: border-box;
     .back {
@@ -183,6 +165,9 @@ export default {
       margin-top: 30px;
       padding: 0 20px;
       box-sizing: border-box;
+      .el-select {
+        width: 100%;
+      }
       .el-input {
         margin: 4px 0;
       }

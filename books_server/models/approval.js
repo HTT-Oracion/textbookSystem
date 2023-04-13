@@ -12,10 +12,6 @@ module.exports = (sequelize, DataTypes) => {
     phone: {
       type: DataTypes.STRING,
       allowNull: false
-    },
-    position: {
-      type: DataTypes.STRING,
-      allowNull: false
     }
   })
 }

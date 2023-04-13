@@ -20,3 +20,21 @@ a {
 .el-pagination {
   margin-top: 15px;
 }
+.el-select {
+  width: 100%;
+}
+i,
+.el-menu-item,
+.el-submenu,
+.person-level,
+.el-pagination{
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+}
+@media screen and (max-width: 1144px) {
+  .person-level {
+    display: none;
+  }
+}

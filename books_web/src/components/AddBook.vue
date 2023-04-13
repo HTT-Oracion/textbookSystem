@@ -1,12 +1,7 @@
 <template>
   <!-- 添加文章对话框 -->
-  <el-dialog title="添加教材" :visible.sync="addBookVisible" width="50%">
-    <el-form
-      ref="addBookRef"
-      :rules="addBookRules"
-      :model="addBookForm"
-      label-width="100px"
-    >
+  <el-dialog title="添加教材" :visible.sync="addVisible" width="50%" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-form ref="addBookRef" :rules="addBookRules" :model="addBookForm" label-width="100px">
       <el-form-item prop="ISBN" label="isbn编号：">
         <el-input v-model="addBookForm.ISBN"></el-input>
       </el-form-item>
@@ -20,25 +15,22 @@
         <el-input v-model="addBookForm.publish"></el-input>
       </el-form-item>
       <el-form-item prop="date" label="出版日期：">
-        <el-input v-model="addBookForm.date"></el-input>
+        <el-input v-model="addBookForm.date" placeholder="格式为:2021/01/01"></el-input>
       </el-form-item>
       <el-form-item prop="price" label="单价(元)：">
         <el-input v-model.number="addBookForm.price"></el-input>
       </el-form-item>
+      <el-form-item prop="nums" label="数量">
+        <el-input v-model.number="addBookForm.nums"></el-input>
+      </el-form-item>
       <el-form-item prop="category" label="类别：">
         <el-select v-model="addBookForm.category" placeholder="请选择">
-          <el-option
-            v-for="(item, index) in categories"
-            :key="index"
-            :label="item.cat_name"
-            :value="item.id"
-          >
-          </el-option>
+          <el-option v-for="(item, index) in categories" :key="index" :label="item.cat_name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
     </el-form>
     <span slot="footer" class="btns">
-      <el-button @click="$emit('close', false)">取 消</el-button>
+      <el-button @click="$emit('close')">取 消</el-button>
       <el-button type="primary" @click="confirmAddBook">确 定</el-button>
     </span>
   </el-dialog>
@@ -51,7 +43,7 @@ import { getCatesApi, addBookApi } from '@/api/book'
 export default {
   name: 'AddBook',
   props: {
-    addBookVisible: {
+    addVisible: {
       type: Boolean,
       default: false
     }
@@ -65,10 +57,11 @@ export default {
         publish: '',
         date: '',
         price: 0,
-        category: ''
+        category: '',
+        nums: ''
       },
       addBookRules: bookRules,
-      categories: []
+      categories: [],
     }
   },
   methods: {
@@ -77,23 +70,29 @@ export default {
       this.categories = data.result
     },
     confirmAddBook () {
-      this.$confirm('添加新的教材, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      }).then(async () => {
-        const { data } = await addBookApi({ id: nanoid(), ...this.addBookForm })
-        if (data.status === 201) {
-          this.$message.success('添加成功!')
-          this.$emit('update')
+      this.$refs.addBookRef.validate(async val => {
+        if (!val) {
+          return this.$message.error('请填写完整！')
         } else {
-          this.$message.error('添加失败!')
+          this.$confirm('添加新的教材, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+          }).then(async () => {
+            const { data } = await addBookApi({ id: nanoid(), ...this.addBookForm })
+            if (data.status === 201) {
+              this.$message.success('添加成功!')
+              this.$emit('update')
+            } else {
+              this.$message.error('添加失败!')
+            }
+            this.$emit('close')
+          }).catch(() => {
+            this.$message.info('取消操作!')
+            this.$emit('close')
+          })
         }
-        this.$emit('close', false)
-      }).catch(() => {
-        this.$message.success('取消操作!')
-        this.$emit('close', false)
+      })
 
-      });
     }
   },
   created () {

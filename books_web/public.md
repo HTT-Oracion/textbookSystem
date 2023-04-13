@@ -1,6 +1,12 @@
 ## 经常要用到的代码
 ```js
-
+/* level
+0 系统管理员
+1 教材管理员
+2 订购员
+3 审批员
+4 普通用户
+*/
 import { user} from '@/api/user'
 import {errorTip,successTip,infoTip} from '@/utils/viewsTool'
 
@@ -14,3 +20,14 @@ import {errorTip,successTip,infoTip} from '@/utils/viewsTool'
         this.getBookList()
       })
 ```
+
+ <el-dialog title="编辑教材" :visible.sync="editBookVisible" width="50%">
+    
+  </el-dialog>
+
+
+
+
+  ```
+  
+  ```

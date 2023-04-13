@@ -1,5 +1,5 @@
 export const getItem = (name) => {
-  let data = window.localStorage.getItem(name)
+  let data = window.sessionStorage.getItem(name)
   try {
     return JSON.parse(data)
   } catch (error) {
@@ -11,8 +11,8 @@ export const setItem = (name, value) => {
   if (typeof value === 'object') {
     value = JSON.stringify(value)
   }
-  window.localStorage.setItem(name, value)
+  window.sessionStorage.setItem(name, value)
 }
 export const clearStorage = () => {
-  window.localStorage.clear()
+  window.sessionStorage.clear()
 }

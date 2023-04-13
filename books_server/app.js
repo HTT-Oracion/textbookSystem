@@ -10,6 +10,7 @@ app.use(bodyParser.json())
 app.use(cors())
 
 /* 路由 */
+require('./router/common')(app)
 require('./router')(app)
 app.listen(port, () => {
   console.log(`server at ${port}`);

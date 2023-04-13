@@ -24,6 +24,7 @@ Book.belongsTo(Category)
 Category.hasMany(Book)
 /* Class */
 Class.hasMany(Lesson)
+Class.hasMany(Order)
 Class.belongsTo(Major)
 /* Lesson */
 Lesson.hasOne(Order)
@@ -36,6 +37,7 @@ Lesson.belongsTo(Approval)
 /* Major */
 Major.hasMany(Class)
 Major.hasMany(Lesson)
+Major.hasMany(Order)
 Major.belongsTo(Department)
 /* Department */
 Department.hasMany(Major)
@@ -53,6 +55,8 @@ Order.belongsTo(Charge)
 Order.belongsTo(Approval)
 Order.belongsTo(Lesson)
 Order.belongsTo(Department)
+Order.belongsTo(Class)
+Order.belongsTo(Major)
 module.exports = {
   Sequelize,
   connect,

@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     started: {
-      type: DataTypes.DATEONLY
+      type: DataTypes.STRING
     },
     teacher_num: DataTypes.INTEGER
   })

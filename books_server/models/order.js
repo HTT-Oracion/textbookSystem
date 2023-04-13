@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       allowNull: false
     },
+    charge_date: {
+      type: DataTypes.TEXT
+    },
     approval_date: {
       type: DataTypes.TEXT
     },
