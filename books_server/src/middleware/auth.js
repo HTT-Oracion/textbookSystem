@@ -7,8 +7,10 @@ const withListRE = /^(\/user\/(login|register\/*\w*))/g
 async function checkTokenValid(token) {
     let valid = false
     if (!token) return valid 
-    const decoded = decodeToken(token)
-    console.log('verify', token, decoded)
+    if(!/^Bearer/.test(token)) return valid
+
+    const splitToken = token.split(' ')[1]
+    const decoded = decodeToken(splitToken)
     if (decoded?.id) {
         const user = await User.findOne({
             id: decoded.id
@@ -25,7 +27,6 @@ export default (app) => {
         return next()
     } else {
         const isTokenValid = await checkTokenValid(token)
-        console.log('isTokenValid', isTokenValid);
         if (!isTokenValid) {
             return tokenExpiredHandler(res)
         }

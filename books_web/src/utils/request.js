@@ -20,7 +20,8 @@ instance.interceptors.request.use(
   config => {
     const userToken = window.sessionStorage.getItem("userToken");
     if (userToken) {
-      config.headers.Authorization = `Bearer ${userToken}`;
+      config.headers.Authorization = ` ${userToken}`;
+      config.headers.token = `${userToken}`;
     }
     return config;
   },
