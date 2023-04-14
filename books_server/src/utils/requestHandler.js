@@ -24,6 +24,15 @@ export const baseRequestFailOfGet = (res, message, data) => {
   data && extend(result, { data });
   return res.send(result);
 };
+export const baseRequestFailOfPost = (res, message ) => {
+  return baseRequest(res, statusMap.get(Fail.POST_REQUEST), message ?? '创建失败')
+};
+export const baseRequestFailOfPut = (res, message) => {
+  return baseRequest(res, statusMap.get(Fail.PUT_REQUEST), message ?? '修改失败')
+};
+export const baseRequestFailOfDelete = (res, message) => {
+  return baseRequest(res, statusMap.get(Fail.DELETE_REQUEST), message ?? '删除失败')
+};
 
 export const baseRequestSuccessOfModify = (res, message) => {
   return res.send({

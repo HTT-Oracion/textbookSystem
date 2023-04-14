@@ -62,4 +62,6 @@
   - [x] user
   - [x] book
   - [x] category
+  - [x] order
+  - [x] major
   - [x] token校验中间件
