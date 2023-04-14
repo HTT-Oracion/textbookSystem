@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { Book, Class, Major, Department, Charge, Approval } from "#src/models";
+import { Book, Class, Major, Department, Charge, Approval, Lesson } from "#src/models";
 import { extend, getRouter } from "#utils/index";
 import {
   deleteSQLHandler,
@@ -8,7 +8,7 @@ import {
   postSQLHandler,
   putSQLHandler,
 } from "#src/hooks";
-export default (app, Lesson) => {
+export default (app) => {
   const router = getRouter();
   const Op = Sequelize.Op;
   let includeList = [

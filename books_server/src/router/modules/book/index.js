@@ -1,3 +1,5 @@
+import { Sequelize } from "sequelize";
+import { Book } from "#src/models";
 import {
   deleteSQLHandler,
   getListSQLHandler,
@@ -10,8 +12,7 @@ import {
   extend,
   getRouter,
 } from "#utils/index";
-import { Sequelize } from "sequelize";
-export default (app, Book) => {
+export default (app) => {
   const router = getRouter();
   const Op = Sequelize.Op;
   router.get("/list", (req, res) => {

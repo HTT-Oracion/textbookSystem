@@ -1,15 +1,3 @@
-import {
-  connect,
-  User,
-  Book,
-  Category,
-  Department,
-  Major,
-  Lesson,
-  Class as IClass,
-  Order
-} from '../models'
-
 import * as routerModules from "./modules";
 
 // fix: #1 创建表失败
@@ -23,14 +11,14 @@ function forceAsyncConnect() {
 function mountRouter(app) {
   const { user, book, category, department, major, lesson, class: iClass,order } = routerModules;
   // 调用路由
-  user(app, User);
-  book(app, Book, Category);
-  category(app, Category);
-  department(app, Department)
-  major(app, Major)
-  lesson(app, Lesson)
-  iClass(app, IClass)
-  order(app, Order)
+  user(app);
+  book(app);
+  category(app);
+  department(app)
+  major(app)
+  lesson(app)
+  iClass(app)
+  order(app)
 }
 
 

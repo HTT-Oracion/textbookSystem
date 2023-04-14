@@ -1,13 +1,6 @@
 import { Sequelize } from "sequelize";
-import { Department } from "#src/models";
+import { Department, Major } from "#src/models";
 import {
-  baseRequestFailOfDelete,
-  baseRequestFailOfGet,
-  baseRequestFailOfPost,
-  baseRequestFailOfPut,
-  baseRequestSuccessOfGet,
-  baseRequestSuccessOfModify,
-  baseSQLErrorHandler,
   extend,
   getRouter,
 } from "#utils/index";
@@ -20,7 +13,7 @@ import {
 } from "#src/hooks";
 const router = getRouter();
 const Op = Sequelize.Op;
-export default (app, Major) => {
+export default (app) => {
   router.get("/list", (req, res) => {
     const query = req.query.query,
       pageNum = parseInt(req.query.pageNum) || 1,

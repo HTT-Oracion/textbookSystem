@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import { Order } from "#src/models";
 import {
   Book,
   Charge,
@@ -20,7 +21,7 @@ import {
 } from "#src/hooks";
 const router = getRouter();
 const Op = Sequelize.Op;
-export default (app, Order) => {
+export default (app) => {
   let includeList = [
     { model: Book },
     { model: Lesson },

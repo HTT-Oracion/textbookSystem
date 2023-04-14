@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import { Category } from "#src/models";
 import {
   extend,
   getRouter,
@@ -13,7 +14,7 @@ import {
 
 const router = getRouter();
 const Op = Sequelize.Op;
-export default (app, Category) => {
+export default (app) => {
   router.get("/list", (req, res) => {
     const query = req.query.query,
       pageNum = parseInt(req.query.pageNum) || 1,

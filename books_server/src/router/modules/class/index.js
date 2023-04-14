@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { Major } from "#src/models";
+import { Major, Class } from "#src/models";
 import { extend, getRouter } from "#utils/index";
 import {
   deleteSQLHandler,
@@ -10,7 +10,7 @@ import {
 } from "#src/hooks";
 const router = getRouter();
 const Op = Sequelize.Op;
-export default (app, Class) => {
+export default (app) => {
   router.get("/list", async (req, res) => {
     const query = req.query.query,
       pageNum = parseInt(req.query.pageNum) || 1,

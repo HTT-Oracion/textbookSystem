@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import { Department } from '#src/models'
 import { extend, getRouter } from "#utils/index";
 import {
   deleteSQLHandler,
@@ -9,7 +10,7 @@ import {
 } from "#src/hooks";
 const router = getRouter();
 const Op = Sequelize.Op;
-export default (app, Department) => {
+export default (app) => {
   router.get("/list", async (req, res) => {
     const query = req.query.query,
       pageNum = parseInt(req.query.pageNum) || 1,

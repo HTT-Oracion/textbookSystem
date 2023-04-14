@@ -1,4 +1,4 @@
-import { Charge, Approval, Class, Department, Major, Book } from "#src/models";
+import { Charge, Approval, Class, Department, Major, Book, User } from "#src/models";
 import {
   getRouter,
   baseSQLErrorHandler,
@@ -15,7 +15,7 @@ import { Fail } from "#src/settings/status";
 import { getListSQLHandler, getSQLHandler } from "#src/hooks";
 
 const router = getRouter();
-export default (app, User) => {
+export default (app) => {
   const Op = Sequelize.Op;
   // 用户列表
   router.get("/list", (_, res) => {
