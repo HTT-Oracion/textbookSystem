@@ -1,102 +1,120 @@
 import { Sequelize } from "sequelize";
-import { Book, Class, Major, Department, Charge, Approval } from '#src/models'
-import { getRouter } from '#utils/index'
+import { Book, Class, Major, Department, Charge, Approval } from "#src/models";
+import {
+  baseRequestFailOfDelete,
+  baseRequestFailOfGet,
+  baseRequestFailOfPost,
+  baseRequestSuccessOfGet,
+  baseRequestSuccessOfModify,
+  baseSQLErrorHandler,
+  getRouter,
+} from "#utils/index";
 export default (app, Lesson) => {
-  const router = getRouter()
-  const Op = Sequelize.Op
+  const router = getRouter();
+  const Op = Sequelize.Op;
   let includeList = [
     { model: Book },
     { model: Class },
     { model: Major },
     { model: Department },
     { model: Charge },
-    { model: Approval }
-  ]
-  router.get('/list', async (req, res) => {
-    const query = req.query.query,
-      pageNum = parseInt(req.query.pageNum) || 1,
-      pageSize = parseInt(req.query.pageSize) || 5
-    let whereObj = {
-      [Op.or]: [
-        { lesson_name: { [Op.like]: '%' + query + '%' } }
-      ]
-    }
-    let total = 0
-    let dataList = []
-    if (query) {
-      const { count, rows } = await Lesson.findAndCountAll({
-        raw: true,
-        where: whereObj,
-        offset: (pageNum - 1) * pageSize,
-        limit: pageSize,
-        include: includeList
-      })
-      total = count
-      dataList = rows
-    } else {
-      const { count, rows } = await Lesson.findAndCountAll({
-        offset: (pageNum - 1) * pageSize,
-        limit: pageSize,
-        include: includeList
-      })
-      total = count
-      dataList = rows
-    }
-    if (dataList.length === 0) return res.send({ status: 422, msg: '没有任何数据!' })
-    return res.send({ status: 200, msg: `获取列表成功`, result: dataList, total })
-  })
-  router.post('/add', async (req, res) => {
-    const result = await Lesson.findOne({ where: { id: req.body.id } })
-    if (result) return res.send({ status: 400, msg: '相同编号!' })
-    const lesson = await Lesson.create(req.body)
-    if (lesson) {
-      return res.send({ status: 201, msg: '创建成功!' })
-    }
-    return res.send({ status: 400, msg: '创建失败!' })
-  })
-  router.get('/:id', async (req, res) => {
-    const dep = await Lesson.findOne({
-      where: { id: req.params.id },
-      include: includeList
-    })
-    if (!dep) return res.send({ status: 400, msg: '查找失败' })
-    return res.send({ status: 200, msg: '查找成功', result: dep })
-  })
-  router.get('/byCharge/:id', async (req, res) => {
-    const list = await Lesson.findAll({ where: { chargeId: req.params.id }, include: Book })
-    return res.send({ status: 200, msg: '获取列表成功!', result: list })
-  })
-  router.get('/byApproval/:id', async (req, res) => {
-    const list = await Lesson.findAll({ where: { approvalId: req.params.id }, include: Book })
-    return res.send({ status: 200, msg: '获取列表成功!', result: list })
-  })
-  router.put('/:id', async (req, res) => {
-    console.log(req.body, req.params.id);
-    const result = await Lesson.update(req.body, {
-      where: { id: req.params.id }
-    })
-    if (result) return res.send({ status: 200, msg: '修改成功!' })
-    return res.send({ status: 400, msg: '修改失败!' })
-    // console.log(result);
-    try {
-      await Lesson.update(req.body, {
-        where: { id: req.params.id }
-      })
-      return res.send({ status: 200, msg: '修改成功!' })
-    }
-    catch {
-      return res.send({ status: 400, msg: '修改失败!' })
-    }
-  })
-  router.delete('/:id', async (req, res) => {
-    try {
-      await Lesson.destroy({
-        where: { id: req.params.id }
-      })
-      return res.send({ status: 200, msg: '删除成功!' })
-    } catch {
-      return res.send({ status: 400, msg: '删除失败!' })
-    }
-  })
-  app.use('/lesson', router)
-}
+    { model: Approval },
+  ];
+  router.get("/list", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const query = req.query.query,
+        pageNum = parseInt(req.query.pageNum) || 1,
+        pageSize = parseInt(req.query.pageSize) || 5;
+      let whereObj = {
+        [Op.or]: [{ lesson_name: { [Op.like]: "%" + query + "%" } }],
+      };
+      let result;
+      if (query) {
+        result = await Lesson.findAndCountAll({
+          raw: true,
+          where: whereObj,
+          offset: (pageNum - 1) * pageSize,
+          limit: pageSize,
+          include: includeList,
+        });
+      } else {
+        result = await Lesson.findAndCountAll({
+          offset: (pageNum - 1) * pageSize,
+          limit: pageSize,
+          include: includeList,
+        });
+      }
+
+      baseRequestFailOfGet(res, null, {
+        list: Z?.rows ?? [],
+        total: result?.total ?? 0,
+      });
+    }, res);
+  });
+  router.post("/add", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const exist = await Lesson.findOne({ where: { id: req.body.id } });
+      if (exist) return baseRequestFailOfPost(res);
+      const result = await Lesson.create(req.body);
+      !result
+        ? baseRequestFailOfPost(res)
+        : baseRequestSuccessOfModify(res, "创建成功");
+    }, res);
+  });
+  router.get("/:id", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const result = await Lesson.findOne({
+        where: { id: req.params.id },
+        include: includeList,
+      });
+      !result
+        ? baseRequestFailOfGet(res)
+        : baseRequestSuccessOfGet(res, null, { result });
+    }, res);
+  });
+  router.get("/byCharge/:id", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const result = await Lesson.findAndCountAll({
+        where: { chargeId: req.params.id },
+        include: Book,
+      });
+      baseRequestFailOfGet(res, null, {
+        list: result?.rows ?? [],
+        total: result?.total ?? 0,
+      });
+    }, res);
+  });
+  router.get("/byApproval/:id", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const result = await Lesson.findAndCountAll({
+        where: { approvalId: req.params.id },
+        include: Book,
+      });
+      baseRequestFailOfGet(res, null, {
+        list: result?.rows ?? [],
+        total: result?.total ?? 0,
+      });
+    }, res);
+  });
+  router.put("/:id", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const result = await Lesson.update(req.body, {
+        where: { id: req.params.id },
+      });
+      !result
+        ? baseRequestFailOfPost(res)
+        : baseRequestSuccessOfModify(res, "修改成功");
+    }, res);
+  });
+  router.delete("/:id", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const result = await Lesson.destroy({
+        where: { id: req.params.id },
+      });
+      result[0] !== 1
+        ? baseRequestFailOfDelete(res)
+        : baseRequestSuccessOfModify(res, "删除成功");
+    }, res);
+  });
+  app.use("/lesson", router);
+};

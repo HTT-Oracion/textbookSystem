@@ -19,8 +19,11 @@ export default (app, User) => {
   // 用户列表
   router.get("/list", (_, res) => {
     baseSQLErrorHandler(async () => {
-      const list = await User.findAll();
-      baseRequestSuccessOfGet(res, null, { list: list ?? [] });
+      const result = await User.findAndCountAll();
+      baseRequestSuccessOfGet(res, null, {
+        list: result?.rows ?? [],
+        total: result?.total ?? 0,
+      });
     }, res);
   });
   // 登录
@@ -144,34 +147,38 @@ export default (app, User) => {
   });
   // 删除用户
   router.delete("/:id", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const where = { id: req.params.id };
-      const user = await findUser(res, where);
-      const level = +user.getDataValue("level");
-      if (!user) return;
+    baseSQLErrorHandler(
+      async () => {
+        const where = { id: req.params.id };
+        const user = await findUser(res, where);
+        const level = +user.getDataValue("level");
+        if (!user) return;
 
-      async function deleteUser() {
-        await User.destroy({ where });
-      }
+        async function deleteUser() {
+          await User.destroy({ where });
+        }
 
-      let message = "删除成功";
-      switch (level) {
-        case 0:
-          message = "无法删除管理员账号!";
-        case 1:
-          await deleteUser();
-        case 2:
-          await deleteUser();
-          await Charge.destroy({ where });
-        case 3:
-          await deleteUser();
-          await Approval.destroy({ where });
-        default:
-          level === 0
-            ? baseRequest(res, Fail.DELETE_REQUEST, message)
-            : baseRequestSuccessOfModify(res, "删除成功");
-      }
-    }, res, '删除失败');
+        let message = "删除成功";
+        switch (level) {
+          case 0:
+            message = "无法删除管理员账号!";
+          case 1:
+            await deleteUser();
+          case 2:
+            await deleteUser();
+            await Charge.destroy({ where });
+          case 3:
+            await deleteUser();
+            await Approval.destroy({ where });
+          default:
+            level === 0
+              ? baseRequest(res, Fail.DELETE_REQUEST, message)
+              : baseRequestSuccessOfModify(res, "删除成功");
+        }
+      },
+      res,
+      "删除失败"
+    );
   });
   // 获取用户
   router.get("/:id", (req, res) => {
@@ -210,24 +217,29 @@ export default (app, User) => {
   router.get("/information/:name", (req, res) => {
     baseSQLErrorHandler(async () => {
       const name = req.params.name;
-      let list = [];
+      let result;
       switch (name) {
         case "Book":
-          list = await Book.findAll();
+          result = await Book.findAndCountAll();
           break;
         case "Class":
-          list = await Class.findAll({ include: { model: Major } });
+          result = await Class.findAndCountAll({ include: { model: Major } });
           break;
         case "Major":
-          list = await Major.findAll({ include: { model: Department } });
+          result = await Major.findAndCountAll({
+            include: { model: Department },
+          });
           break;
         case "Department":
-          list = await Department.findAll();
+          result = await Department.findAndCountAll();
           break;
         default:
           break;
       }
-      baseRequestSuccessOfGet(res, null, { list });
+      baseRequestSuccessOfGet(res, null, {
+        list: result?.rows ?? [],
+        total: result?.total ?? 0,
+      });
     }, res);
   });
   app.use("/user", router);
