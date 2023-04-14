@@ -8,86 +8,62 @@ import {
   baseRequestSuccessOfGet,
   baseRequestSuccessOfModify,
   baseSQLErrorHandler,
+  extend,
   getRouter,
 } from "#utils/index";
+import {
+  deleteSQLHandler,
+  getListSQLHandler,
+  getSQLHandler,
+  postSQLHandler,
+  putSQLHandler,
+} from "#src/hooks";
 const router = getRouter();
 const Op = Sequelize.Op;
 export default (app, Major) => {
   router.get("/list", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const query = req.query.query,
-        pageNum = parseInt(req.query.pageNum) || 1,
-        pageSize = parseInt(req.query.pageSize) || 5;
-      console.log(req.query);
-      let where = {
+    const query = req.query.query,
+      pageNum = parseInt(req.query.pageNum) || 1,
+      pageSize = parseInt(req.query.pageSize) || 5;
+    const searchQuery = {
+      include: [{ model: Department }],
+      offset: (pageNum - 1) * pageSize,
+      limit: pageSize,
+    };
+    if (query) {
+      const where = {
         [Op.or]: [{ major_name: { [Op.like]: "%" + query + "%" } }],
       };
-      let result;
-      if (query) {
-        result = await Major.findAndCountAll({
-          raw: true,
-          where,
-          include: [{ model: Department }],
-          offset: (pageNum - 1) * pageSize,
-          limit: pageSize,
-        });
-      } else {
-        result = await Major.findAndCountAll({
-          include: [{ model: Department }],
-          offset: (pageNum - 1) * pageSize,
-          limit: pageSize,
-        });
-      }
-
-      baseRequestFailOfGet(res, null, {
-        list: result?.rows ?? [],
-        total: result?.total ?? 0
-      })
-    }, res);
+      extend(searchQuery, { raw: true, where });
+    }
+    getListSQLHandler(res, Major, {
+      searchQuery,
+    });
   });
   router.post("/add", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const exist = await Major.findOne({ where: { id: req.body.id } });
-      if (exist) {
-        baseRequestFailOfPost(res);
-      } else {
-        const result = await Major.create(req.body);
-        !result
-          ? baseRequestFailOfPost(res)
-          : baseRequestSuccessOfModify(res, "创建成功");
-      }
-    }, res);
+    postSQLHandler(res, Major, {
+      where: { id: req.body.id },
+      create: req.body,
+    });
   });
   router.get("/:id", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await Major.findOne({
+    getSQLHandler(res, Major, {
+      searchQuery: {
         where: { id: req.params.id },
         include: { model: Department },
-      });
-      !result
-        ? baseRequestFailOfGet(res, null)
-        : baseRequestSuccessOfGet(res, null, { result });
-    }, res);
+      },
+    });
   });
   router.put("/:id", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await Major.update(req.body, {
-        where: { id: req.params.id },
-      });
-      !result
-        ? baseRequestFailOfPut(res)
-        : baseRequestSuccessOfModify(res, "修改成功");
-    }, res);
+    putSQLHandler(res, Major, {
+      where: { id: req.params.id },
+      update: req.body,
+    });
   });
   router.delete("/:id", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await Major.destroy({
-        where: { id: req.params.id },
-      });
-      result[0] !== 1
-        ? baseRequestFailOfDelete(res)
-        : baseRequestSuccessOfModify(res, "删除成功");
-    }, res);
+    deleteSQLHandler(res, Major, {
+      where: { id: req.params.id },
+    });
   });
   app.use("/major", router);
 };

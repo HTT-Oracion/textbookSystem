@@ -9,14 +9,15 @@ import {
   Major,
 } from "#src/models";
 import {
-  baseRequest,
-  baseRequestFailOfGet,
-  baseRequestSuccessOfGet,
-  baseRequestSuccessOfModify,
-  baseSQLErrorHandler,
   getRouter,
 } from "#utils/index";
-import { Fail, statusMap } from "#src/settings/status";
+import {
+  deleteSQLHandler,
+  getListSQLHandler,
+  getSQLHandler,
+  postSQLHandler,
+  putSQLHandler,
+} from "#src/hooks";
 const router = getRouter();
 const Op = Sequelize.Op;
 export default (app, Order) => {
@@ -30,36 +31,31 @@ export default (app, Order) => {
     { model: Major },
   ];
   router.get("/list", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const query = req.query.query;
-      let where = {
-        [Op.or]: [{ book_name: { [Op.like]: "%" + query + "%" } }],
-      };
-      const result = await Order.findAll({
-        where,
-        include: includeList,
-      });
-      baseRequestFailOfGet(res, null, {
-        list: result.rows,
-        total: result.total,
-      });
-    }, res);
+    const query = req.query.query;
+    const where = {
+      [Op.or]: [{ book_name: { [Op.like]: "%" + query + "%" } }],
+    };
+    const searchQuery = {
+      where,
+      include: includeList,
+    };
+    getListSQLHandler(res, Order, {
+      searchQuery,
+    });
   });
   router.get("/list/all", async (_, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await Order.findAll({
+    getListSQLHandler(res, Order, {
+      searchQuery: {
         include: includeList,
-      });
-      baseRequestFailOfGet(res, null, {
-        list: result.rows,
-        total: result.total,
-      });
-    }, res);
+      },
+    });
   });
   router.post("/add", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const { bookId, id, departmentId, chargeId, classId, majorId } = req.body;
-      const result = await Order.create({
+    const { bookId, id, departmentId, chargeId, classId, majorId } = req.body;
+
+    postSQLHandler(res, Order, {
+      where: null,
+      create: {
         bookId,
         lessonId: id,
         departmentId,
@@ -70,62 +66,36 @@ export default (app, Order) => {
         charge_date: Date.now(),
         approval_status: 0,
         id: `order${id}`,
-      });
-      !result
-        ? baseRequest(res, statusMap.get(Fail.POST_REQUEST), "创建失败")
-        : baseRequestSuccessOfModify(res, "创建成功");
-    }, res);
+      },
+    });
   });
   router.get("/:id", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await Order.findOne(
-        { include: includeList },
-        { where: { id: req.params.id } }
-      );
-      !result
-        ? baseRequestFailOfGet(res, "查询失败")
-        : baseRequestSuccessOfGet(res, null, { result });
-    }, res);
+    getSQLHandler(res, Order, {
+      searchQuery: [{ include: includeList }, { where: { id: req.params.id } }],
+    });
   });
   // 订购
   router.put("/approval/:id", async (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await Order.update(
-        {
-          approvalId: req.body.approvalId,
-          approval_status: 1,
-          approval_date: Date.now(),
-        },
-        {
-          where: { id: `order${req.params.id}` },
-        }
-      );
-      !result
-        ? baseRequest(res, statusMap.get(Fail.PUT_REQUEST), "修改失败")
-        : baseRequestSuccessOfModify(res, "修改成功");
-    }, res);
+    putSQLHandler(res, Order, {
+      where: { id: `order${req.params.id}` },
+      update: {
+        approvalId: req.body.approvalId,
+        approval_status: 1,
+        approval_date: Date.now(),
+      },
+    });
   });
   // 入库
   router.put("/warehouse/:id", async (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await Order.update(
-        { charge_status: 2 },
-        {
-          where: { id: req.params.id },
-        }
-      );
-      !result
-        ? baseRequest(res, statusMap.get(Fail.PUT_REQUEST), "修改失败")
-        : baseRequestSuccessOfModify(res, "修改成功");
-    }, res);
+    putSQLHandler(res, Order, {
+      where: { id: req.params.id },
+      update: { charge_status: 2 },
+    });
   });
   router.delete("/:id", async (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await Order.destroy({ where: { id: req.params.id } });
-      result[0] !== 1
-        ? baseRequest(res, statusMap.get(Fail.PUT_REQUEST), "删除失败")
-        : baseRequestSuccessOfModify(res, "删除成功");
-    }, res);
+    deleteSQLHandler(res, Order, {
+      where: { id: req.params.id },
+    });
   });
   app.use("/order", router);
 };

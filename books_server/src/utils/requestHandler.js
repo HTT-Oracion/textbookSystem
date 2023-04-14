@@ -24,7 +24,7 @@ export const baseRequestFailOfGet = (res, message, data) => {
   data && extend(result, { data });
   return res.send(result);
 };
-export const baseRequestFailOfPost = (res, message ) => {
+export const baseRequestFailOfPost = (res, message) => {
   return baseRequest(res, statusMap.get(Fail.POST_REQUEST), message ?? '创建失败')
 };
 export const baseRequestFailOfPut = (res, message) => {

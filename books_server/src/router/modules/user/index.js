@@ -12,19 +12,14 @@ import { Sequelize } from "sequelize";
 import { findUser, checkPassword } from "./helpers";
 import { generateToken } from "#src/utils/token";
 import { Fail } from "#src/settings/status";
+import { getListSQLHandler, getSQLHandler } from "#src/hooks";
 
 const router = getRouter();
 export default (app, User) => {
   const Op = Sequelize.Op;
   // 用户列表
   router.get("/list", (_, res) => {
-    baseSQLErrorHandler(async () => {
-      const result = await User.findAndCountAll();
-      baseRequestSuccessOfGet(res, null, {
-        list: result?.rows ?? [],
-        total: result?.total ?? 0,
-      });
-    }, res);
+    getListSQLHandler(res, User);
   });
   // 登录
   router.post("/login", (req, res) => {
@@ -100,50 +95,45 @@ export default (app, User) => {
   });
   //
   router.get("/charge/list", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const query = req.query.query,
-        pageNum = parseInt(req.query.pageNum) || 1,
-        pageSize = parseInt(req.query.pageSize) || 5;
+    const query = req.query.query,
+      pageNum = parseInt(req.query.pageNum) || 1,
+      pageSize = parseInt(req.query.pageSize) || 5;
+    const searchQuery = {
+      offset: (pageNum - 1) * pageSize,
+      limit: pageSize,
+    };
+    if (query) {
       const where = {
         [Op.or]: [{ username: { [Op.like]: "%" + query + "%" } }],
       };
-      const findQuery = {
-        offset: (pageNum - 1) * pageSize,
-        limit: pageSize,
-      };
-      if (query) {
-        extend(findQuery, { raw: true, where });
-      } else {
-        extend(findQuery, { where: { level: [2, 0] } });
-      }
+      extend(searchQuery, { raw: true, where });
+    } else {
+      extend(searchQuery, { where: { level: [2, 0] } });
+    }
 
-      const { count, rows } = await User.findAndCountAll(findQuery);
-      baseRequestSuccessOfGet(res, "查询成功", { list: rows, total: count });
-    }, res);
+    getListSQLHandler(res, User, {
+      searchQuery: searchQuery,
+    });
   });
   // 审核列表
   router.get("/approval/list", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const query = req.query.query,
-        pageNum = parseInt(req.query.pageNum) || 1,
-        pageSize = parseInt(req.query.pageSize) || 5;
-      const where = {
-        [Op.or]: [{ username: { [Op.like]: "%" + query + "%" } }],
-        level: [3, 0],
-      };
-      const findQuery = {
-        offset: (pageNum - 1) * pageSize,
-        limit: pageSize,
-      };
-      if (query) {
-        extend(findQuery, { raw: true, where });
-      } else {
-        extend(findQuery, { where: { level: [3, 0] } });
-      }
-
-      const { count, rows } = await User.findAndCountAll(findQuery);
-      baseRequestSuccessOfGet(res, "查询成功", { list: rows, total: count });
-    }, res);
+    const query = req.query.query,
+      pageNum = parseInt(req.query.pageNum) || 1,
+      pageSize = parseInt(req.query.pageSize) || 5;
+    const where = {
+      [Op.or]: [{ username: { [Op.like]: "%" + query + "%" } }],
+      level: [3, 0],
+    };
+    const searchQuery = {
+      offset: (pageNum - 1) * pageSize,
+      limit: pageSize,
+    };
+    if (query) {
+      extend(searchQuery, { raw: true, where });
+    } else {
+      extend(searchQuery, { where: { level: [3, 0] } });
+    }
+    getListSQLHandler(res, User, { searchQuery });
   });
   // 删除用户
   router.delete("/:id", (req, res) => {
@@ -182,12 +172,9 @@ export default (app, User) => {
   });
   // 获取用户
   router.get("/:id", (req, res) => {
-    baseSQLErrorHandler(async () => {
-      const user = await findUser(res, { id: req.params.id });
-      if (user) {
-        baseRequestSuccessOfGet(res, "获取成功");
-      }
-    }, res);
+    getSQLHandler(res, User, {
+      searchQuery: { where: { id: req.params.id } }
+    })
   });
   // 修改用户
   router.put("/:id", (req, res) => {

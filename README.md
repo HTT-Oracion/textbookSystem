@@ -59,10 +59,13 @@
 ### 后端部分
 - [x] 后端统一切换成 `esm`模块
 - 模块重构
+  - [x] 新增 hooks 统一处理操作类似的增删改查操作
   - [x] user
   - [x] book
   - [x] category
   - [x] order
   - [x] major
   - [x] lesson
+  - [x] department
+  - [x] class
   - [x] token校验中间件
