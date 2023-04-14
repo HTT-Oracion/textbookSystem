@@ -13,7 +13,7 @@ async function checkTokenValid(token) {
     const decoded = decodeToken(splitToken)
     if (decoded?.id) {
         const user = await User.findOne({
-            id: decoded.id
+            where: { id: decoded.id }
         })
         valid = !!user   
     } 

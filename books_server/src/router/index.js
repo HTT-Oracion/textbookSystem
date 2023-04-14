@@ -9,16 +9,11 @@ function forceAsyncConnect() {
 
 // 挂载路由
 function mountRouter(app) {
-  const { user, book, category, department, major, lesson, class: iClass,order } = routerModules;
   // 调用路由
-  user(app);
-  book(app);
-  category(app);
-  department(app)
-  major(app)
-  lesson(app)
-  iClass(app)
-  order(app)
+  Object.keys(routerModules).map(key => {
+    const module = routerModules[key]
+    module(app)
+  })
 }
 
 
