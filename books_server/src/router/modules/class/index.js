@@ -1,6 +1,7 @@
+import { Sequelize } from "sequelize";
 import { Major } from '#src/models'
 import { getRouter } from '#utils/index'
-export default (app, Class, Sequelize) => {
+export default (app, Class) => {
   const router = getRouter()
   const Op = Sequelize.Op
   router.get('/list', async (req, res) => {

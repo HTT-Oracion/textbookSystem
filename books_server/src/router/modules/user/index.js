@@ -8,19 +8,20 @@ import {
   extend,
   baseRequest,
 } from "#utils/index";
+import { Sequelize } from "sequelize";
 import { findUser, checkPassword } from "./helpers";
 import { generateToken } from "#src/utils/token";
 import { Fail } from "#src/settings/status";
 
 const router = getRouter();
-export default (app, User, Sequelize) => {
+export default (app, User) => {
   const Op = Sequelize.Op;
   // 用户列表
   router.get("/list", (_, res) => {
     baseSQLErrorHandler(async () => {
       const list = await User.findAll();
       baseRequestSuccessOfGet(res, null, { list: list ?? [] });
-    });
+    }, res);
   });
   // 登录
   router.post("/login", (req, res) => {
@@ -33,7 +34,7 @@ export default (app, User, Sequelize) => {
         const token = generateToken({ id: user.getDataValue("id") });
         baseRequestSuccessOfGet(res, "登陆成功", { token, user });
       });
-    });
+    }, res);
   });
   // 注册
   router.post("/register", async (req, res) => {
@@ -66,7 +67,7 @@ export default (app, User, Sequelize) => {
         }
         baseRequestSuccessOfModify(res, "创建成功");
       }
-    });
+    }, res);
   });
   // 普通注册
   router.post("/register/normal", (req, res) => {
@@ -92,7 +93,7 @@ export default (app, User, Sequelize) => {
         await User.create(createQuery);
         baseRequestSuccessOfModify(res, "创建成功");
       }
-    });
+    }, res);
   });
   //
   router.get("/charge/list", (req, res) => {
@@ -115,7 +116,7 @@ export default (app, User, Sequelize) => {
 
       const { count, rows } = await User.findAndCountAll(findQuery);
       baseRequestSuccessOfGet(res, "查询成功", { list: rows, total: count });
-    });
+    }, res);
   });
   // 审核列表
   router.get("/approval/list", (req, res) => {
@@ -139,7 +140,7 @@ export default (app, User, Sequelize) => {
 
       const { count, rows } = await User.findAndCountAll(findQuery);
       baseRequestSuccessOfGet(res, "查询成功", { list: rows, total: count });
-    });
+    }, res);
   });
   // 删除用户
   router.delete("/:id", (req, res) => {
@@ -170,7 +171,7 @@ export default (app, User, Sequelize) => {
             ? baseRequest(res, Fail.DELETE_REQUEST, message)
             : baseRequestSuccessOfModify(res, "删除成功");
       }
-    });
+    }, res, '删除失败');
   });
   // 获取用户
   router.get("/:id", (req, res) => {
@@ -179,7 +180,7 @@ export default (app, User, Sequelize) => {
       if (user) {
         baseRequestSuccessOfGet(res, "获取成功");
       }
-    });
+    }, res);
   });
   // 修改用户
   router.put("/:id", (req, res) => {
@@ -204,7 +205,7 @@ export default (app, User, Sequelize) => {
         await updateInfo(Approval);
       }
       baseRequestSuccessOfModify(res, "修改成功");
-    });
+    }, res);
   });
   router.get("/information/:name", (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -227,7 +228,7 @@ export default (app, User, Sequelize) => {
           break;
       }
       baseRequestSuccessOfGet(res, null, { list });
-    });
+    }, res);
   });
   app.use("/user", router);
 };

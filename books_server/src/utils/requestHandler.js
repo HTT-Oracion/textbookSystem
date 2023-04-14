@@ -39,23 +39,22 @@ export const requestFailOfPassword = (res, message) => {
   });
 };
 
-export const baseSQLErrorHandler = (fn, res) => {
+export const baseSQLErrorHandler = (fn, res, message) => {
   try {
-    fn();
+    fn && fn();
   } catch (error) {
     console.log("error", error);
     res.send({
       status: statusMap.get(Fail.DATA_BASE),
-      message: "接口请求失败，ERROR:" + error,
+      message: message ?? "接口请求失败，ERROR:" + error,
     });
   }
 };
 
-
 export const tokenExpiredHandler = (res, fn) => {
-  fn && fn()
+  fn && fn();
   res.send({
     status: statusMap.get(Fail.FORBIDDEN),
-    message: 'token失效'
-  })
-}
+    message: "token失效",
+  });
+};

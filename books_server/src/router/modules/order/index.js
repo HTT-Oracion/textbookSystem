@@ -1,7 +1,8 @@
+import { Sequelize } from "sequelize";
 import { Book, Charge, Approval, Department, Lesson, Class, Major } from '#src/models'
 import { getRouter } from '#utils/index'
 
-export default (app, Order, Sequelize) => {
+export default (app, Order) => {
   const router = getRouter()
   const Op = Sequelize.Op
   let includeList = [

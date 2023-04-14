@@ -32,7 +32,7 @@ const Order = order(connect, DataTypes);
 // 创建表关系
 function createTablesRelations() {
   /* 表关系 */
-  /* 后面还有前面的主键。 */
+  /* 后表含有前表的主键。 */
   /* Book */
   Book.hasMany(Lesson);
   Book.hasMany(Order);
@@ -79,7 +79,6 @@ function createTablesRelations() {
 createTablesRelations();
 
 export {
-  Sequelize,
   connect,
   User,
   Book,

@@ -1,5 +1,4 @@
 import {
-  Sequelize,
   connect,
   User,
   Book,
@@ -24,14 +23,14 @@ function forceAsyncConnect() {
 function mountRouter(app) {
   const { user, book, category, department, major, lesson, class: iClass,order } = routerModules;
   // 调用路由
-  user(app, User, Sequelize);
+  user(app, User);
   book(app, Book, Category);
-  category(app, Category, Sequelize);
-  department(app, Department, Sequelize)
-  major(app, Major, Sequelize)
-  lesson(app, Lesson, Sequelize)
-  iClass(app, IClass, Sequelize)
-  order(app, Order, Sequelize)
+  category(app, Category);
+  department(app, Department)
+  major(app, Major)
+  lesson(app, Lesson)
+  iClass(app, IClass)
+  order(app, Order)
 }
 
 

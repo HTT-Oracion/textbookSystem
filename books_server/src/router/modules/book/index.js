@@ -41,7 +41,7 @@ export default (app, Book) => {
         bookList = rows;
       }
       baseRequestSuccessOfGet(res, null, { list: bookList, total });
-    });
+    }, res);
   });
   router.get("/:id", (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -49,7 +49,7 @@ export default (app, Book) => {
       result
         ? baseRequestSuccessOfGet(res, "查询成功", { result })
         : baseRequestFailOfGet(res, "查询失败");
-    });
+    }, res);
   });
   router.put("/:id", (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -59,7 +59,7 @@ export default (app, Book) => {
       result
         ? baseRequestSuccessOfModify(res, "修改成功")
         : baseRequest(res, statusMap.get(Fail.PUT_REQUEST), "修改失败");
-    });
+    }, res);
   });
   router.delete("/:id", async (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -67,7 +67,7 @@ export default (app, Book) => {
         where: { id: req.params.id },
       });
       baseRequestSuccessOfModify(res, "删除成功");
-    });
+    }, res);
   });
   router.post("/add", (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -95,7 +95,7 @@ export default (app, Book) => {
           ? baseRequestSuccessOfModify(res, "创建成功")
           : baseRequestFailOfGet(res, "创建失败");
       }
-    });
+    }, res);
   });
   router.get("/:id", (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -105,7 +105,7 @@ export default (app, Book) => {
       result
         ? baseRequestSuccessOfGet(res, "查询成功", { result })
         : baseRequestFailOfGet(res, "查询失败");
-    });
+    }, res);
   });
   router.put("/:id", (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -115,7 +115,7 @@ export default (app, Book) => {
       result
         ? baseRequestSuccessOfModify(res, "修改成功")
         : baseRequest(res, statusMap.get(Fail.PUT_REQUEST), "修改失败");
-    });
+    }, res);
   });
   router.put("/num/:id", (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -131,7 +131,7 @@ export default (app, Book) => {
       result[0] === 1
         ? baseRequestSuccessOfModify(res, "修改成功")
         : baseRequest(res, statusMap.get(Fail.PUT_REQUEST), "修改失败");
-    });
+    }, res);
   });
   router.delete("/:id", (req, res) => {
     baseSQLErrorHandler(async () => {
@@ -139,7 +139,7 @@ export default (app, Book) => {
         where: { id: req.params.id },
       });
       baseRequestSuccessOfModify(res, "删除成功");
-    });
+    }, res);
   });
   app.use("/book", router);
 };

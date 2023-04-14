@@ -1,73 +1,90 @@
-import { getRouter } from '#utils/index'
-export default (app, Category, Sequelize) => {
-    const router = getRouter()
-    const Op = Sequelize.Op
-    router.get('/list', async (req, res) => {
+import { Sequelize } from "sequelize";
+import {
+  baseRequest,
+  baseRequestFailOfGet,
+  baseRequestSuccessOfGet,
+  baseRequestSuccessOfModify,
+  baseSQLErrorHandler,
+  getRouter,
+} from "#utils/index";
+import { Fail, statusMap } from "#src/settings/status";
+
+const router = getRouter();
+const Op = Sequelize.Op;
+export default (app, Category) => {
+  router.get("/list", (req, res) => {
+    baseSQLErrorHandler(async () => {
       const query = req.query.query,
         pageNum = parseInt(req.query.pageNum) || 1,
-        pageSize = parseInt(req.query.pageSize) || 5
+        pageSize = parseInt(req.query.pageSize) || 5;
       let whereObj = {
-        [Op.or]: [
-          { cat_name: { [Op.like]: '%' + query + '%' } }
-        ]
-      }
-      let total = 0
-      let dataList = []
+        [Op.or]: [{ cat_name: { [Op.like]: "%" + query + "%" } }],
+      };
+      let result;
       if (query) {
-        const { count, rows } = await Category.findAndCountAll({
+        result = await Category.findAndCountAll({
           raw: true,
           where: whereObj,
           offset: (pageNum - 1) * pageSize,
-          limit: pageSize
-        })
-        total = count
-        dataList = rows
+          limit: pageSize,
+        });
       } else {
-        const { count, rows } = await Category.findAndCountAll({
+        result = await Category.findAndCountAll({
           offset: (pageNum - 1) * pageSize,
-          limit: pageSize
-        })
-        total = count
-        dataList = rows
+          limit: pageSize,
+        });
       }
-      if (dataList.length === 0) return res.send({ status: 422, msg: '没有任何数据!' })
-      return res.send({ status: 200, msg: `获取列表成功`, result: dataList, total })
-    })
-    router.get('/:id', async (req, res) => {
+
+      baseRequestSuccessOfGet(res, null, {
+        list: result.rows,
+        total: result.total,
+      });
+    }, res);
+  });
+  router.get("/:id", (req, res) => {
+    baseSQLErrorHandler(async () => {
       const cate = await Category.findOne({
-        where: { id: req.params.id }
-      })
-      if (!cate) return res.send({ status: 401, msg: '查找失败' })
-      return res.send({ status: 200, msg: '查找成功', result: cate })
-    })
-    router.put('/:id', async (req, res) => {
-      console.log(req.body, req.params.id);
+        where: { id: req.params.id },
+      });
+      !cate
+        ? baseRequestFailOfGet(res)
+        : baseRequestSuccessOfGet(res, null, { result: data });
+    }, res);
+  });
+  router.put("/:id", (req, res) => {
+    baseSQLErrorHandler(async () => {
       const cate = await Category.update(req.body, {
-        where: { id: req.params.id }
-      })
-      if (!cate) return res.send({ status: 401, msg: '修改失败!' })
-      return res.send({ status: 200, msg: '修改成功!' })
-    })
-    router.delete('/:id', async (req, res) => {
-      try {
+        where: { id: req.params.id },
+      });
+      !cate
+        ? baseRequest(res, statusMap.get(Fail.PUT_REQUEST), "修改失败")
+        : baseRequestSuccessOfModify(res, "修改成功");
+    }, res);
+  });
+  router.delete("/:id", (req, res) => {
+    baseSQLErrorHandler(
+      async () => {
         await Category.destroy({
-          where: { id: req.params.id }
-        })
-        return res.send({ status: 200, msg: '删除成功!' })
-      } catch {
-        return res.send({ status: 400, msg: '删除失败!' })
+          where: { id: req.params.id },
+        });
+        baseRequestSuccessOfModify(res, "删除成功");
+      },
+      res,
+      "删除失败"
+    );
+  });
+  router.post("/add", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const { id } = req.body;
+      const cate = await Category.findOne({ where: { id } });
+      if (cate) {
+        baseRequest(res, statusMap.get(Fail.POST_REQUEST), '创建失败')
+      } else {
+        const result = await Category.create(req.body)
+        !result ? baseRequest(res, statusMap.get(Fail.POST_REQUEST), '创建失败')
+        : baseRequestSuccessOfModify(res, '创建成功')
       }
-    })
-    router.post('/add', async (req, res) => {
-      const { id } = req.body
-      const cate = await Category.findOne({ where: { id } })
-      if (cate) return res.send({ status: 401, msg: '相同编号!' })
-      try {
-        await Category.create(req.body)
-        return res.send({ status: 200, msg: '创建成功!' })
-      } catch {
-        return res.send({ status: 401, msg: '创建失败!' })
-      }
-    })
-    app.use('/category', router)
-  }
+    }, res);
+  });
+  app.use("/category", router);
+};
