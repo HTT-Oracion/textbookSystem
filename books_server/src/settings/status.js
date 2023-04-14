@@ -9,7 +9,7 @@ export const Fail = {
   PUT_REQUEST: "PUT_REQUEST_FAIL",
   DELETE_REQUEST: "DELETE_REQUEST_FAIL",
   FORBIDDEN: "FORBIDDEN",
-  NOT_FOUND: "FORBIDDEN",
+  NOT_FOUND: "NOT_FOUND",
   PASSWORD: "PASSWORD_ERROR",
   NET_WORK: "NET_WORK_ERROR",
   DATA_BASE: "DATA_BASE_ERROR",
@@ -17,16 +17,16 @@ export const Fail = {
 
 export const statusMap = new Map([
   // 成功状态
-  [[Success.GET_REQUEST], 200],
-  [[Success.MODIFY_REQUEST], 201],
+  [Success.GET_REQUEST, 200],
+  [Success.MODIFY_REQUEST, 201],
   // 失败状态
-  [[Fail.GET_REQUEST], 420],
-  [[Fail.POST_REQUEST], 421],
-  [[Fail.PUT_REQUEST], 422],
-  [[Fail.DELETE_REQUEST], 423],
-  [[Fail.FORBIDDEN], 403],
-  [[Fail.NOT_FOUND], 404],
-  [[Fail.PASSWORD], 411],
-  [[Fail.NET_WORK], 500],
-  [[Fail.DATA_BASE], 501],
+  [Fail.GET_REQUEST, 420],
+  [Fail.POST_REQUEST, 421],
+  [Fail.PUT_REQUEST, 422],
+  [Fail.DELETE_REQUEST, 423],
+  [Fail.FORBIDDEN, 403],
+  [Fail.NOT_FOUND, 404],
+  [Fail.PASSWORD, 411],
+  [Fail.NET_WORK, 500],
+  [Fail.DATA_BASE, 501]
 ]);

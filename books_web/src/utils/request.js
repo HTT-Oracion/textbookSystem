@@ -31,9 +31,10 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   response => {
-    const status = response.data.status;
+    console.log(response);
+    const status = response.data.status
     if (status !== 200 && status !== 201) {
-      errorTip(response.data.msg);
+      errorTip(response.data.msg ?? response.data.message ?? '请求失败');
     }
     return response;
   },

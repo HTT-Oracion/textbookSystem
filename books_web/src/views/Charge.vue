@@ -98,7 +98,7 @@
       </el-dialog>
     </el-card>
   </div>
-</template>   
+</template>
 
 <script>
 import { pageMixin } from '@/mixin'
@@ -153,13 +153,13 @@ export default {
   methods: {
     async getChargeList () {
       const { data } = await getChargesApi(this.queryInfo)
-      data.result.forEach(async (item) => {
+      data.result.list.forEach(async (item) => {
         item.classList = []
         if (item.classList.length !== 0) return
         const { data: res } = await getLessonInCharge(item.id)
         item.classList = res.result
       })
-      this.chargeList = data.result
+      this.chargeList = data.result.list
       this.total = data.result.length
     },
     async handleExpand (row) {

@@ -9,7 +9,7 @@ export const successTip = (msg, show) => {
 export const errorTip = (msg, show) => {
   Message({
     message: msg,
-    type: 'warning',
+    type: 'error',
     showClose: show | false
   })
 }

@@ -17,6 +17,8 @@ const routes = [
       { path: '/department', name: 'Department', component: () => import('@/views/Department') },
       { path: '/major', name: 'Major', component: () => import('@/views/Major') },
       { path: '/class', name: 'Class', component: () => import('@/views/Class') },
+      { path: '/charge', name: 'Class', component: () => import('@/views/Charge') },
+      { path: '/approval', name: 'Class', component: () => import('@/views/Approval') },
     ]
   },
 ]

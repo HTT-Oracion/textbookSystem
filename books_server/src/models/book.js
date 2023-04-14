@@ -10,7 +10,7 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
     },
     ISBN: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING,
       unique: true,
       allowNull: false,
     },
@@ -31,7 +31,7 @@ export default (sequelize, DataTypes) => {
     },
     times: {
       type: DataTypes.INTEGER,
-      defalutValue: 0,
+      defaultValue: 0,
     },
     nums: {
       type: DataTypes.INTEGER,

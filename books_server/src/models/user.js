@@ -20,7 +20,7 @@ export default (sequelize, DataTypes) => {
     },
     level: {
       type: DataTypes.INTEGER,
-      defalutValue: 0
+      defaultValue: 0
     },
     position: {
       type: DataTypes.STRING,

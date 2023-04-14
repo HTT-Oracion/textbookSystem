@@ -2,7 +2,7 @@
   <!-- 添加文章对话框 -->
   <el-dialog
     title="添加教材"
-    :visible.sync="addVisible"
+    :visible.sync="visible"
     width="50%"
     :show-close="false"
     :close-on-click-modal="false"
@@ -50,7 +50,7 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="btns">
-      <el-button @click="$emit('close')">取 消</el-button>
+      <el-button @click="hideModal">取 消</el-button>
       <el-button type="primary" @click="confirmAddBook">确 定</el-button>
     </span>
   </el-dialog>
@@ -62,14 +62,9 @@ import { bookRules } from "@/utils/validateRules";
 import { getCatesApi, addBookApi } from "@/api/book";
 export default {
   name: "AddBook",
-  props: {
-    addVisible: {
-      type: Boolean,
-      default: false
-    }
-  },
   data() {
     return {
+      visible: false,
       addBookForm: {
         ISBN: "",
         book_name: "",
@@ -78,10 +73,10 @@ export default {
         date: "",
         price: 0,
         category: "",
-        nums: ""
+        nums: "",
       },
       addBookRules: bookRules,
-      categories: []
+      categories: [],
     };
   },
   methods: {
@@ -91,18 +86,18 @@ export default {
     },
     confirmAddBook() {
       this.$refs.addBookRef
-        .validate(async val => {
+        .validate(async (val) => {
           if (!val) {
             return this.$message.error("请填写完整！");
           } else {
             this.$confirm("添加新的教材, 是否继续?", "提示", {
               confirmButtonText: "确定",
-              cancelButtonText: "取消"
+              cancelButtonText: "取消",
             })
               .then(async () => {
                 const { data } = await addBookApi({
                   id: nanoid(),
-                  ...this.addBookForm
+                  ...this.addBookForm,
                 });
                 if (data.status === 201) {
                   this.$message.success("添加成功!");
@@ -110,24 +105,34 @@ export default {
                 } else {
                   this.$message.error("添加失败!");
                 }
+                this.hideModal();
                 this.$emit("close");
               })
               .catch(() => {
                 this.$message.info("取消操作!");
+                this.hideModal();
                 this.$emit("close");
               });
           }
+          this.hideModal();
           this.$emit("close");
         })
         .catch(() => {
           this.$message.info("取消操作!");
+          this.hideModal();
           this.$emit("close");
         });
-    }
+    },
+    showModal() {
+      this.visible = true;
+    },
+    hideModal() {
+      this.visible = false;
+    },
   },
   created() {
     this.getCategories();
-  }
+  },
 };
 </script>
 

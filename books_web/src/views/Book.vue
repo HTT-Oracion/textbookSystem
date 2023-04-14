@@ -4,7 +4,7 @@
       <my-bread nameOne="教材管理" nameTwo="教材列表"></my-bread>
       <el-row>
         <el-col :span="8">
-          <el-input v-model="queryInfo.query">
+          <el-input v-model="queryInfo.query" placeholder="query">
             <el-button
               slot="append"
               icon="el-icon-search"
@@ -13,7 +13,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="toAdd">添加教材</el-button>
+          <el-button type="primary" @click="addBook">添加教材</el-button>
         </el-col>
       </el-row>
       <!-- 表格 -->
@@ -49,11 +49,11 @@
         :total="total"
       ></el-pagination>
     </el-card>
-    <add-book
-      :addBookVisible="addBookVisible"
+    <AddBook
+      ref="addBookRef"
       @close="addBookVisible = false"
       @update="getBookList"
-    ></add-book>
+    />
     <edit-book
       :editBookVisible="editBookVisible"
       :currentBook="currentBook"
@@ -81,7 +81,8 @@ export default {
       bookList: [],
       currentBook: {},
       addBookVisible: false,
-      editBookVisible: false
+      editBookVisible: false,
+      addBookRef: null
     };
   },
   watch: {
@@ -95,11 +96,12 @@ export default {
   methods: {
     async getBookList() {
       const { data } = await getBooksApi(this.queryInfo);
-      this.bookList = data.result;
-      this.total = data.total;
-      console.log(data);
+      this.bookList = data.result.list;
+      this.total = data.result.total;
     },
-    addBook() {},
+    addBook() {
+      this.$refs.addBookRef.showModal()
+    },
     async toEdit(id) {
       const { data } = await getBookById(id);
       this.currentBook = data.result;

@@ -105,7 +105,8 @@ export default {
         if (this.adminRegister) {  // 管理员注册
           const form = { id: nanoid(), ...this.registerForm }
           const { data } = await addUserApi(form)
-          if (data.status === 201) {
+          console.log(data);
+          if (data.status === 200) {
             const { username, password } = this.registerForm
             console.log(username, password);
             successTip('注册成功！')
@@ -118,7 +119,7 @@ export default {
           // 普通注册
           const form = { id: nanoid(), ...this.registerForm }
           const { data } = await addNormalUserApi(form)
-          if (data.status === 201) {
+          if (data.status === 200) {
             const { username, password } = this.registerForm
             console.log(username, password);
             successTip('注册成功！')

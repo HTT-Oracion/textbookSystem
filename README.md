@@ -12,7 +12,9 @@
 ## 后端
 
 ```
- express jsonwebtoken mysql squelize(用于操作mysql)
+ express jsonwebtoken mysql sequelize(用于操作mysql)
+
+ https://sequelize.org/
 ```
 
 ## 项目运行
@@ -56,3 +58,7 @@
 ## 重构进度
 
 - [x] 后端统一切换成 `esm`模块
+- 模块重构
+  - [x] user
+  - [x] book
+  - [x] token校验中间件

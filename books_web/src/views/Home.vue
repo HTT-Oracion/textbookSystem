@@ -39,7 +39,7 @@
         <el-main>
           <router-view />
         </el-main>
-        <el-footer>教材征订管理系统 by 吕锦滨</el-footer>
+        <el-footer>教材征订管理系统 by Doro</el-footer>
       </el-container>
     </el-container>
   </el-container>

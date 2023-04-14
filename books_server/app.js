@@ -1,19 +1,20 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import { common } from '#src/router/modules'
+import auth from '#src/middleware/auth'
 import router from '#src/router'
-const app = express()
-const port = 3333
+import { port } from '#settings/system'
 
+const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-/* 跨域 */
+// 跨域
 app.use(cors())
 
-/* 路由 */
-common(app)
+// token校验中间件
+auth(app)
+// 路由
 router(app)
 app.listen(port, () => {
-  console.log(`server at ${port}`);
+  console.log(`server is running at port: ${port}`);
 })
