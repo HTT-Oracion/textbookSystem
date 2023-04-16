@@ -1,0 +1,8 @@
+{
+    "version": "0.0.1",
+    "name": "textbook-system",
+    "scripts": {
+        "web": "cd ./books_web/ && npm run start",
+        "server": "cd ./books_server/ && npm run start"
+    }
+}
