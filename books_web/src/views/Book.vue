@@ -16,6 +16,7 @@
           <el-button type="primary" @click="addBook">添加教材</el-button>
         </el-col>
       </el-row>
+      <el-button type="primary" @click="onLogout">退出登录</el-button>
       <!-- 表格 -->
       <el-table :data="bookList" border stripe>
         <el-table-column prop="id" label="id"> </el-table-column>
@@ -67,6 +68,7 @@
 import AddBook from "@/components/AddBook";
 import EditBook from "@/components/EditBook";
 import { pageMixin } from "@/mixin";
+import { logoutApi } from '@/api/user'
 import { getBooksApi, getBookById, deleteBookApi } from "@/api/book";
 // import { errorTip, successTip, infoTip } from '@/utils/viewsTool'
 export default {
@@ -125,6 +127,10 @@ export default {
     closeDialog() {
       this.addVisible = false;
       this.editVisible = false;
+    },
+    async onLogout() {
+      const { data } = logoutApi()
+      console.log(data);
     }
   },
   created() {

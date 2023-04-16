@@ -7,12 +7,17 @@ import {
   baseRequestSuccessOfModify,
   extend,
   baseRequest,
+  baseRequestFailOfPost,
+  tokenExpiredHandler,
 } from "#utils/index";
 import { Sequelize } from "sequelize";
 import { findUser, checkPassword } from "./helpers";
 import { generateToken } from "#src/utils/token";
 import { Fail } from "#src/settings/status";
 import { getListSQLHandler, getSQLHandler } from "#src/hooks";
+import { tokenRE } from "#src/settings/reg";
+import { checkTokenValid } from "#src/middleware/auth";
+import { setRedisValue } from "#src/redis/client";
 
 const router = getRouter();
 export default (app) => {
@@ -229,5 +234,24 @@ export default (app) => {
       });
     }, res);
   });
+  router.post("/logout", (req, res) => {
+    baseSQLErrorHandler(async () => {
+      const token = req.headers.token || ''
+      let valid
+      let rawToken
+      if (!token || !tokenRE.test(token)) {
+        valid = false
+      } else {
+        rawToken = token.split(' ')[1]
+        valid = await checkTokenValid(token)
+      }
+      // 如果是合法的token,则保存到redis黑名单里，然后退出登录
+      if (valid) {
+        setRedisValue(rawToken, rawToken)
+      } 
+      valid ? baseRequestSuccessOfModify(res, '退出登录成功!')
+      : tokenExpiredHandler(res, null, '当前登录状态已过期')
+    })
+  })
   app.use("/user", router);
 };

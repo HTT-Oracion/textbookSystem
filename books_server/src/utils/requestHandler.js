@@ -60,10 +60,10 @@ export const baseSQLErrorHandler = (fn, res, message) => {
   }
 };
 
-export const tokenExpiredHandler = (res, fn) => {
+export const tokenExpiredHandler = (res, fn, message) => {
   fn && fn();
   res.send({
     status: statusMap.get(Fail.FORBIDDEN),
-    message: "token失效",
+    message: message || "token失效",
   });
 };

@@ -3,6 +3,9 @@ import api from '@/utils/request'
 export const loginApi = data => {
   return api('post', '/user/login', data)
 }
+export const logoutApi = () => {
+  return api('post', '/user/logout')
+}
 
 // 所有用户
 export const getUsersApi = () => {
