@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { getKey } from './system';
-const expiresIn = 3600 * 24 * 3; // 3天
+import { expiresIn } from '#src/settings/system';
 export const generateToken = (signParams) => {
   const token =
     "Bearer " +

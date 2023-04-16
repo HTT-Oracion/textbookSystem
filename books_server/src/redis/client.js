@@ -1,5 +1,5 @@
 import { createClient } from 'redis'
-
+import { expiresIn } from '#src/settings/system';
 let client = createClient()
 export default (async() => {
     console.log('redis');
@@ -11,8 +11,14 @@ export const getRedisValue = async (key, value) => {
     return await client.get(key)
 }
 
+export const existRedisKey = async (key) => {
+    return await client.exists(key)
+}
+
 export const setRedisValue = async(key, value) => {
-    return await client.set(key, value)
+    const result = await client.set(key, value)
+    await client.expire(key, expiresIn)
+    return result 
 }
 
 export const closeRedisClient = async() => {
