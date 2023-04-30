@@ -1,11 +1,5 @@
 import * as routerModules from "./modules";
-
-// fix: #1 创建表失败
-// 调用函数强制更新
-function forceAsyncConnect() {
-  // { alter: true }时会做更新操作，但是有时会报错.
-  connect.sync({ force: true });
-}
+import { forceAsyncConnect } from "#src/utils";
 
 // 挂载路由
 function mountRouter(app) {
